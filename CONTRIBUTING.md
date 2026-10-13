@@ -4,6 +4,7 @@ Thanks for wanting to contribute to Kaneo! Whether you're fixing bugs, adding fe
 
 ## Table of Contents
 
+- [Personal Fork Releases](#personal-fork-releases)
 - [Code of Conduct](#code-of-conduct)
 - [Getting Started](#getting-started)
 - [Making Your First Contribution](#making-your-first-contribution)
@@ -17,6 +18,35 @@ Thanks for wanting to contribute to Kaneo! Whether you're fixing bugs, adding fe
   - [Project Structure](#project-structure)
 - [Using AI](#using-ai)
 - [Need Help?](#need-help)
+
+## Personal Fork Releases
+
+This repository is the personal fork maintained by `stimw`. Its release identifier
+is `<upstream-version>-stimw.<revision>`, for example `2.46.2-stimw.1`.
+
+| Change | Fork release identifier |
+| --- | --- |
+| First custom release based on upstream 2.46.2 | `2.46.2-stimw.1` |
+| Next custom release on the same upstream base | `2.46.2-stimw.2` |
+| First custom release after merging upstream 2.47.0 | `2.47.0-stimw.1` |
+
+- Keep the upstream version as the base. Increase the fork revision for each
+  published custom release on that base, starting at `1`.
+- Reset the fork revision to `1` when a new upstream release becomes the base.
+  An upstream merge alone does not publish or deploy a release.
+- Preserve upstream Git tags. Tag a custom release as
+  `v2.46.2-stimw.1` and use `2.46.2-stimw.1` for its human-readable image tag.
+  Record the upstream tag/commit and the fork commit in the release notes.
+- Retain the immutable source reference `ghcr.io/stimw/kaneo:sha-<full-commit-sha>`.
+  Deployment repositories select a tested image and pin its digest.
+- Keep production credentials, private configuration and customer data in the
+  separate deployment repository's private storage, outside this public fork.
+
+The current fork workflow publishes SHA-tagged images only. Human-readable fork
+release tags and automatic version stamping still need to be wired into the
+release workflow before the first custom release. The initial image from commit
+`c14c0fc8` contains CI configuration changes and uses upstream version `2.46.2`;
+it is not numbered as a custom application release.
 
 ## Code of Conduct
 
