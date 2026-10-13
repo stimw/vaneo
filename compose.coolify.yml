@@ -1,7 +1,7 @@
 # Kaneo on Coolify
 #
 # Deploy this stack from a Git source with Coolify's "Docker Compose" build pack:
-#   Public Repository -> https://github.com/usekaneo/kaneo
+#   Public Repository -> https://github.com/stimw/vaneo
 #   Build Pack: Docker Compose | Base Directory: / | Compose Location: compose.coolify.yml
 #
 # Assign a domain to the "kaneo" service using its container port, e.g. https://kaneo.example.com:5173
@@ -10,7 +10,7 @@
 # The only required environment variable is KANEO_CLIENT_URL (your public URL, without :5173).
 # AUTH_SECRET and the PostgreSQL password are auto-generated via Coolify magic variables.
 # Do NOT set KANEO_API_URL — the entrypoint derives it from KANEO_CLIENT_URL (public URL + /api).
-# The Kaneo image tracks the latest release by default. Set KANEO_IMAGE_TAG to a
+# The Kaneo image tracks main by default. Set KANEO_IMAGE_TAG to a
 # release tag to hold a deployment on a known version.
 
 services:
@@ -30,10 +30,10 @@ services:
       retries: 5
 
   kaneo:
-    # Tracks the latest release. The API runs database migrations on startup, so
+    # Tracks main. The API runs database migrations on startup, so
     # set KANEO_IMAGE_TAG to a release tag if a redeploy should stay on a known
     # version rather than pick up whatever is newest.
-    image: ghcr.io/usekaneo/kaneo:${KANEO_IMAGE_TAG:-latest}
+    image: ghcr.io/stimw/vaneo:${KANEO_IMAGE_TAG:-latest}
     environment:
       - KANEO_CLIENT_URL=${KANEO_CLIENT_URL:?}
       - AUTH_SECRET=${SERVICE_HEX_64_KANEO:?}

@@ -1,4 +1,4 @@
-name: Fork checks and image
+name: Vaneo checks and image
 
 on:
   push:
@@ -10,12 +10,12 @@ permissions:
   contents: read
 
 concurrency:
-  group: fork-${{ github.ref }}
+  group: vaneo-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   checks:
-    if: github.repository == 'stimw/kaneo'
+    if: github.repository == 'stimw/vaneo'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
@@ -41,7 +41,7 @@ jobs:
         run: pnpm run "$CHECK"
 
   image:
-    if: github.repository == 'stimw/kaneo'
+    if: github.repository == 'stimw/vaneo'
     needs: checks
     runs-on: ubuntu-latest
     timeout-minutes: 60
@@ -68,16 +68,18 @@ jobs:
           file: Dockerfile.kaneo
           platforms: linux/amd64
           push: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
-          tags: ghcr.io/stimw/kaneo:sha-${{ github.sha }}
+          tags: |
+            ghcr.io/stimw/vaneo:sha-${{ github.sha }}
+            ghcr.io/stimw/vaneo:latest
           labels: |
-            org.opencontainers.image.source=https://github.com/stimw/kaneo
+            org.opencontainers.image.source=https://github.com/stimw/vaneo
             org.opencontainers.image.revision=${{ github.sha }}
-          cache-from: type=gha,scope=kaneo-amd64
-          cache-to: type=gha,mode=max,scope=kaneo-amd64
+          cache-from: type=gha,scope=vaneo-amd64
+          cache-to: type=gha,mode=max,scope=vaneo-amd64
       - name: Record image for the deployment repository
         if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
           COMMIT: ${{ github.sha }}
         run: |
-          printf 'Image: `ghcr.io/stimw/kaneo:sha-%s`\n\nDigest: `ghcr.io/stimw/kaneo@%s`\n\nDeploy from the separate deployment repository.\n' "$COMMIT" "$DIGEST" >> "$GITHUB_STEP_SUMMARY"
+          printf 'Image: `ghcr.io/stimw/vaneo:sha-%s`\n\nDigest: `ghcr.io/stimw/vaneo@%s`\n\nDeploy from the separate deployment repository.\n' "$COMMIT" "$DIGEST" >> "$GITHUB_STEP_SUMMARY"

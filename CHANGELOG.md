@@ -1,3 +1,12 @@
+# Vaneo changelog
+
+## 0.1.0
+
+- Establish the independent Vaneo repository and image namespace.
+- Retain the existing application behavior from Kaneo 2.46.2.
+
+## Inherited Kaneo history
+
 ### Bug Fixes
 
 - **web:** space tooltip labels from key hints: [85d2a84](https://github.com/usekaneo/kaneo/commit/85d2a8494b136da66b490288fb678fc67ac25ad8)
