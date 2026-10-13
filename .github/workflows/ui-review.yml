@@ -49,7 +49,7 @@ jobs:
 
   screenshots:
     needs: authorize
-    if: needs.authorize.outputs.allowed == 'true'
+    if: ${{ github.repository == 'usekaneo/kaneo' && (needs.authorize.outputs.allowed == 'true') }}
     # Only authorized requests enter this group, so outsiders cannot cancel a run.
     concurrency:
       group: peekareq-${{ needs.authorize.outputs.pr }}

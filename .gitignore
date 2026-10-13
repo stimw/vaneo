@@ -62,3 +62,18 @@ apps/web/.tanstack/
 # TypeScript incremental build state
 *.tsbuildinfo
 .vitest/
+
+# Private operational files must stay outside this public source repository.
+.env.*
+!.env.sample
+!**/.env.example
+!**/.env.test.example
+!apps/web/.env.production
+.deployment/
+.aws/
+.ssh/
+*.key
+*.p12
+*.pfx
+*.tfstate
+*.tfstate.*

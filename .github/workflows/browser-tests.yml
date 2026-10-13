@@ -12,6 +12,7 @@ concurrency:
 
 jobs:
   smoke:
+    if: github.repository == 'usekaneo/kaneo'
     name: Chromium smoke tests
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 30

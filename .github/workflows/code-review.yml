@@ -42,7 +42,7 @@ jobs:
 
   review:
     needs: authorize
-    if: needs.authorize.outputs.allowed == 'true'
+    if: ${{ github.repository == 'usekaneo/kaneo' && (needs.authorize.outputs.allowed == 'true') }}
     runs-on: blacksmith-4vcpu-ubuntu-2404
     timeout-minutes: 20
     concurrency:

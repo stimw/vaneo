@@ -12,3 +12,17 @@
 .env.*
 !apps/web/.env.production
 *.log
+
+# Exclude operational credentials from local Docker build contexts too.
+**/.env
+**/.env.*
+!apps/web/.env.production
+**/.deployment
+**/.aws
+**/.ssh
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx
+**/*.tfstate
+**/*.tfstate.*
