@@ -80,6 +80,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "heic-to/next": path.resolve(
+        __dirname,
+        "./src/lib/disabled-heic-decoder.ts",
+      ),
+      "heic-to": path.resolve(__dirname, "./src/lib/disabled-heic-decoder.ts"),
       "@": path.resolve(__dirname, "./src"),
       "@i18n": path.resolve(__dirname, "../../i18n"),
     },
@@ -95,4 +100,6 @@ export default defineConfig({
     },
     target: "esnext",
   },
+  // Keep Compresso's optional HEIC decoder out of the image worker's download.
+  worker: { format: "es" },
 });

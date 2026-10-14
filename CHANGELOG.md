@@ -1,5 +1,12 @@
 # Vaneo changelog
 
+## 0.2.0
+
+- Optimize JPEG and PNG images before uploading from task descriptions, comments,
+  and new-task drafts. Use native WebP when available, with JPEG/PNG fallbacks.
+- Preserve screenshot dimensions, transparency, animated images, and photo
+  orientation. Upload the original if optimization fails or does not reduce size.
+
 ## 0.1.0
 
 - Establish the independent Vaneo repository and image namespace.

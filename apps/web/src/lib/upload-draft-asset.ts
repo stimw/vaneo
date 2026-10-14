@@ -2,12 +2,14 @@ import { i18n } from "@/lib/i18n";
 import { client } from "@kaneo/libs";
 import { HttpError } from "@/lib/http-error";
 import { getImageAltText, isSupportedImageFile } from "@/lib/upload-task-image";
+import { prepareUploadImage } from "./prepare-upload-image";
 
 export async function uploadDraftAsset(projectId: string, file: File) {
+  const preparedFile = await prepareUploadImage(file);
   const json = {
-    filename: file.name || "file",
-    contentType: file.type || "application/octet-stream",
-    size: file.size,
+    filename: preparedFile.name || "file",
+    contentType: preparedFile.type || "application/octet-stream",
+    size: preparedFile.size,
     surface: "description" as const,
   };
   const response = await client.task["draft-upload"][":projectId"].$post({
@@ -19,7 +21,7 @@ export async function uploadDraftAsset(projectId: string, file: File) {
   const stored = await fetch(upload.uploadUrl, {
     method: "PUT",
     headers: upload.headers,
-    body: file,
+    body: preparedFile,
   });
   if (!stored.ok)
     throw new Error(i18n.t("activity:comment.editor.failedToUploadFile"));
@@ -34,12 +36,12 @@ export async function uploadDraftAsset(projectId: string, file: File) {
   return {
     id: asset.id,
     url: asset.url,
-    alt: getImageAltText(file.name),
+    alt: getImageAltText(preparedFile.name),
     filename: json.filename,
-    kind: isSupportedImageFile(file)
+    kind: isSupportedImageFile(preparedFile)
       ? ("image" as const)
       : ("attachment" as const),
     mimeType: json.contentType,
-    size: file.size,
+    size: preparedFile.size,
   };
 }

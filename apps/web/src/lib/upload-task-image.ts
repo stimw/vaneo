@@ -1,6 +1,7 @@
 import createImageUpload, {
   finalizeImageUpload,
 } from "@/fetchers/task/create-image-upload";
+import { prepareUploadImage } from "./prepare-upload-image";
 
 const allowedImageMimeTypes = new Set([
   "image/apng",
@@ -46,20 +47,21 @@ export async function uploadTaskImage({
     }
   }
 
-  const contentType = file.type || "application/octet-stream";
+  const preparedFile = await prepareUploadImage(file);
+  const contentType = preparedFile.type || "application/octet-stream";
 
   const upload = await createImageUpload({
     taskId,
-    filename: file.name || "image",
+    filename: preparedFile.name || "image",
     contentType,
-    size: file.size,
+    size: preparedFile.size,
     surface,
   });
 
   const response = await fetch(upload.uploadUrl, {
     method: "PUT",
     headers: upload.headers,
-    body: file,
+    body: preparedFile,
   });
 
   if (!response.ok) {
@@ -69,18 +71,18 @@ export async function uploadTaskImage({
   const asset = await finalizeImageUpload({
     taskId,
     key: upload.key,
-    filename: file.name || "image",
+    filename: preparedFile.name || "image",
     contentType,
-    size: file.size,
+    size: preparedFile.size,
     surface,
   });
 
   return {
     url: asset.url,
-    alt: getImageAltText(file.name || "image"),
-    filename: file.name || "file",
-    kind: isSupportedImageFile(file) ? "image" : "attachment",
+    alt: getImageAltText(preparedFile.name || "image"),
+    filename: preparedFile.name || "file",
+    kind: isSupportedImageFile(preparedFile) ? "image" : "attachment",
     mimeType: contentType,
-    size: file.size,
+    size: preparedFile.size,
   };
 }
