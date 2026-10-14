@@ -85,7 +85,7 @@ describe("upload image compression policy", () => {
     vi.clearAllMocks();
   });
 
-  it("uses WebP for screenshots without shrinking or fitting their quality to a size target", async () => {
+  it("uses lossy WebP for PNGs without shrinking or fitting their quality to a size target", async () => {
     const source = image();
     const result = await compressUploadImage(source as globalThis.File);
     expect(result.name).toBe("test.webp");
@@ -94,7 +94,7 @@ describe("upload image compression policy", () => {
     expect(compress).toHaveBeenCalledWith(
       "blob:source",
       expect.objectContaining({
-        quality: 1,
+        quality: 0.8,
         maxWidth: Infinity,
         maxHeight: Infinity,
         maxSizeMB: Infinity,
@@ -102,6 +102,60 @@ describe("upload image compression policy", () => {
     );
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:source");
     expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:result");
+  });
+
+  it.each([
+    { lossy: 20, maximum: 100, expected: 20 },
+    { lossy: 100, maximum: 20, expected: 20 },
+  ])(
+    "keeps the smaller PNG encoding: %j",
+    async ({ lossy, maximum, expected }) => {
+      compress
+        .mockResolvedValueOnce({
+          blob: new Blob([new Uint8Array(lossy)], { type: "image/webp" }),
+          url: "blob:lossy",
+        })
+        .mockResolvedValueOnce({
+          blob: new Blob([new Uint8Array(maximum)], { type: "image/webp" }),
+          url: "blob:maximum",
+        });
+      const result = await compressUploadImage(image() as globalThis.File);
+      expect(result.size).toBe(expected);
+      expect(compress.mock.calls.map(([, options]) => options.quality)).toEqual(
+        [0.8, 1],
+      );
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:lossy");
+      expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:maximum");
+    },
+  );
+
+  it("retains a valid lossy result if the maximum-quality attempt fails", async () => {
+    compress
+      .mockResolvedValueOnce({
+        blob: new Blob(["lossy image"], { type: "image/webp" }),
+        url: "blob:lossy",
+      })
+      .mockRejectedValueOnce(new Error("Maximum-quality encoding failed"));
+    const result = await compressUploadImage(image() as globalThis.File);
+    expect(result.type).toBe("image/webp");
+    expect(await result.text()).toBe("lossy image");
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:lossy");
+  });
+
+  it("ignores a smaller candidate with an incorrect actual format", async () => {
+    compress
+      .mockResolvedValueOnce({
+        blob: new Blob(["lossy image"], { type: "image/webp" }),
+        url: "blob:lossy",
+      })
+      .mockResolvedValueOnce({
+        blob: new Blob(["png"], { type: "image/png" }),
+        url: "blob:maximum",
+      });
+    const result = await compressUploadImage(image() as globalThis.File);
+    expect(result.type).toBe("image/webp");
+    expect(await result.text()).toBe("lossy image");
+    expect(URL.revokeObjectURL).toHaveBeenCalledWith("blob:maximum");
   });
 
   it("uses high-quality JPEG for opaque Safari screenshots", async () => {
@@ -192,7 +246,7 @@ describe("upload image compression policy", () => {
   });
 
   it("retains the original if encoding returns a larger file or the wrong actual format", async () => {
-    const source = image() as globalThis.File;
+    const source = image("image/jpeg") as globalThis.File;
     compress.mockResolvedValueOnce({
       blob: new Blob([new Uint8Array(source.size + 1)], { type: "image/webp" }),
       url: "blob:result",

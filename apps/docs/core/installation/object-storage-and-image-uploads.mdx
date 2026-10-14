@@ -26,7 +26,7 @@ The browser and the Kaneo API must both reach `S3_ENDPOINT`. Use a hostname such
 
 The storage bucket stays private. Kaneo checks access and serves files through its own API. Images appear inline; PDFs, ZIPs, and other files appear as attachments.
 
-Task descriptions, comments, and new-task drafts automatically optimize static JPEG and PNG uploads between 64 KiB and 20 MiB in the browser. Photos use quality 0.85 and a maximum 2560px long edge. PNG screenshots retain their dimensions and use the highest native WebP quality, or JPEG quality 0.92 when WebP encoding is unavailable. Transparent images retain PNG when WebP is unavailable. Animated images and other formats are kept intact. Only a smaller result is uploaded and stored; encoding failures retain the original file. Images above 24 megapixels bypass optimization to bound browser memory. Existing attachments are unaffected.
+Task descriptions, comments, and new-task drafts automatically optimize static JPEG and PNG uploads between 64 KiB and 20 MiB in the browser. JPEG photos use quality 0.85 and a maximum 2560px long edge. PNG uploads retain their dimensions. For WebP, the browser compares quality 0.8 with native maximum quality and uses the smaller result, favoring maximum quality on ties. This compresses photos saved as PNG while retaining maximum-quality screenshots when that encoding is more efficient. When WebP encoding is unavailable, opaque PNGs use JPEG quality 0.92 and transparent images retain PNG. Animated images and other formats are kept intact. Only a smaller result is uploaded and stored; encoding failures retain the original file. Images above 24 megapixels bypass optimization to bound browser memory. Existing attachments are unaffected.
 
 ## Required configuration
 

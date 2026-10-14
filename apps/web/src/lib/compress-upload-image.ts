@@ -71,7 +71,7 @@ export async function compressUploadImage(file: File, signal?: AbortSignal) {
   if (!shouldCompressUploadImage(file)) return file;
 
   let sourceUrl: string | undefined;
-  let resultUrl: string | undefined;
+  const resultUrls = new Set<string>();
   try {
     const type = file.type.toLowerCase();
     const info = readUploadImageInfo(await file.arrayBuffer(), type);
@@ -94,16 +94,41 @@ export async function compressUploadImage(file: File, signal?: AbortSignal) {
     sourceUrl = URL.createObjectURL(file);
     // File input makes Compresso lower quality until it beats the source size.
     // A local URL preserves our quality floor; we compare sizes ourselves below.
-    const result = await compress(sourceUrl, {
+    const options = {
       format,
-      quality: type === "image/png" ? (webp ? 1 : 0.92) : 0.85,
+      quality: type === "image/png" ? (webp ? 0.8 : 0.92) : 0.85,
       maxWidth: type === "image/png" ? Infinity : 2560,
       maxHeight: type === "image/png" ? Infinity : 2560,
       maxSizeMB: Infinity,
       maxInputPixels: MAX_COMPRESS_IMAGE_PIXELS,
       signal,
-    });
-    resultUrl = result.url;
+    } as const;
+    let result = await compress(sourceUrl, options);
+    resultUrls.add(result.url);
+    if (webp && type === "image/png") {
+      // PNGs include photos as well as screenshots. Flat screenshots often
+      // encode smaller at native maximum quality; photos need lossy encoding.
+      try {
+        signal?.throwIfAborted();
+        const maximumQuality = await compress(sourceUrl, {
+          ...options,
+          quality: 1,
+        });
+        resultUrls.add(maximumQuality.url);
+        if (
+          maximumQuality.blob.type === "image/webp" &&
+          maximumQuality.blob.size > 0 &&
+          (result.blob.type !== "image/webp" ||
+            result.blob.size === 0 ||
+            maximumQuality.blob.size <= result.blob.size)
+        ) {
+          result = maximumQuality;
+        }
+      } catch {
+        // An optional higher-quality attempt must not discard a valid result.
+        signal?.throwIfAborted();
+      }
+    }
     signal?.throwIfAborted();
     const expectedType = `image/${format}`;
     // Canvas can silently return PNG for an unsupported requested format.
@@ -125,6 +150,6 @@ export async function compressUploadImage(file: File, signal?: AbortSignal) {
     return file;
   } finally {
     if (sourceUrl) URL.revokeObjectURL(sourceUrl);
-    if (resultUrl) URL.revokeObjectURL(resultUrl);
+    for (const url of resultUrls) URL.revokeObjectURL(url);
   }
 }

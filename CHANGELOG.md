@@ -1,5 +1,12 @@
 # Vaneo changelog
 
+## 0.2.1
+
+- Fix large WebP uploads from photos saved as PNG: compare quality 0.8 with
+  native maximum quality, using the smaller file without resizing PNG images.
+- Keep maximum-quality screenshot encoding when it produces a smaller file,
+  and retain a valid result if the optional alternative encoder attempt fails.
+
 ## 0.2.0
 
 - Optimize JPEG and PNG images before uploading from task descriptions, comments,
