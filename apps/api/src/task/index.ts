@@ -40,6 +40,11 @@ import createTask from "./controllers/create-task";
 import deleteTask from "./controllers/delete-task";
 import duplicateTask from "./controllers/duplicate-task";
 import exportTasks from "./controllers/export-tasks";
+import exportCompletedTasks from "./controllers/export-completed-tasks";
+import {
+  completedExportQuery,
+  completedExportSchema,
+} from "./completed-export-schema";
 import getAssignedTasks from "./controllers/get-assigned-tasks";
 import getTaskByTicketId from "./controllers/get-task-by-ticket-id";
 import getTask from "./controllers/get-task";
@@ -452,6 +457,27 @@ const exportTasksRoute = createRoute({
   request: { params: projectIdParam },
   responses: {
     200: jsonResponse("The exported project and tasks", taskExportSchema),
+    403: errorResponse("No access to the project"),
+    404: errorResponse("Project not found"),
+  },
+});
+
+const exportCompletedTasksRoute = createRoute({
+  method: "get",
+  operationId: "exportCompletedTasks",
+  path: "/completed-export/{projectId}",
+  tags: ["Tasks"],
+  summary: "Export completed tasks and all their time entries",
+  description:
+    "Currently completed tasks, including completed tasks that were archived, whose most recent completion falls in [from, to). Totals use the editable task time total, including manual corrections. Historical time entries are included even outside the period; their sum may differ from a corrected total. Running entries are listed but excluded until stopped. Historical tasks with unknown completion dates are counted separately. Completion follows the project's final workflow columns.",
+  middleware: [
+    workspaceAccess.fromProject("projectId"),
+    requireWorkspacePermission({ task: ["read"] }),
+  ] as const,
+  request: { params: projectIdParam, query: completedExportQuery },
+  responses: {
+    200: jsonResponse("Completed tasks and time report", completedExportSchema),
+    400: errorResponse("Invalid period or report too large"),
     403: errorResponse("No access to the project"),
     404: errorResponse("Project not found"),
   },
@@ -1013,6 +1039,15 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
 
     return c.json(exportData, 200);
   })
+  .openapi(exportCompletedTasksRoute, async (c) =>
+    c.json(
+      await exportCompletedTasks(
+        c.req.valid("param").projectId,
+        c.req.valid("query"),
+      ),
+      200,
+    ),
+  )
   .openapi(importTasksRoute, async (c) => {
     const { projectId } = c.req.valid("param");
     const { tasks } = c.req.valid("json");

@@ -1122,7 +1122,8 @@
 				"member": "Members",
 				"invitation": "Invitations",
 				"team": "Teams",
-				"ac": "Roles and permissions"
+				"ac": "Roles and permissions",
+				"timeEntry": "Time entries"
 			},
 			"permissions": {
 				"project": {
@@ -1269,6 +1270,16 @@
 					"delete": {
 						"label": "Delete roles",
 						"description": "Delete custom workspace roles."
+					}
+				},
+				"timeEntry": {
+					"create": {
+						"label": "Log time",
+						"description": "Record time spent on tasks."
+					},
+					"update": {
+						"label": "Edit time entries",
+						"description": "Set task time totals and edit time entries."
 					}
 				}
 			},
@@ -2356,6 +2367,19 @@
 			"newField": "New field",
 			"fieldsTitle": "Fields",
 			"fieldsDescription": "Drag to change the order they appear in on a task."
+		},
+		"timeReport": {
+			"title": "Completed tasks & time",
+			"description": "Export completed tasks and all their time entries for a period.",
+			"details": "Includes currently completed tasks and completed tasks that were archived. All recorded time is included; running timers are listed but excluded from totals.",
+			"from": "Completed from",
+			"to": "Completed through",
+			"timeZone": "Dates use {{timeZone}}. Both selected dates are included.",
+			"download": "Download JSON",
+			"invalidPeriod": "Select a valid completion date range.",
+			"exportError": "Could not export the time report.",
+			"unknownDates": "{{count}} older tasks have unknown completion dates and were excluded.",
+			"export": "Export completed tasks & time"
 		}
 	},
 	"navigation": {
@@ -3271,6 +3295,15 @@
 			"markdownCopied": "Copied as Markdown",
 			"copyFailed": "Couldn't copy to the clipboard.",
 			"pageUrlCopied": "Copied page URL"
+		},
+		"time": {
+			"label": "Time",
+			"hours": "Hours",
+			"save": "Save time",
+			"loadError": "Could not load time",
+			"retry": "Retry",
+			"saveError": "Could not save time",
+			"invalid": "Enter a valid, non-negative number of hours."
 		}
 	},
 	"invitations": {

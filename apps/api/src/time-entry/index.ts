@@ -10,10 +10,17 @@ import createTimeEntry from "./controllers/create-time-entry";
 import getTimeEntriesByTaskId from "./controllers/get-time-entries";
 import getTimeEntry from "./controllers/get-time-entry";
 import updateTimeEntry from "./controllers/update-time-entry";
-import { timeEntryListSchema, timeEntrySchema } from "./response";
+import getTaskTime from "./controllers/get-task-time";
+import setTaskTime from "./controllers/set-task-time";
+import {
+  timeEntryListSchema,
+  timeEntrySchema,
+  taskTimeSchema,
+} from "./response";
 import {
   createTimeEntryBody,
   taskIdParam,
+  setTaskTimeBody,
   timeEntryParam,
   updateTimeEntryBody,
 } from "./schema";
@@ -60,7 +67,7 @@ const createTimeEntryRoute = createRoute({
     "Log time against a task. Omit endTime to start a running entry that can be closed later with an update.",
   middleware: [
     workspaceAccess.fromTaskId(),
-    requireWorkspacePermission({ task: ["update"] }),
+    requireWorkspacePermission({ timeEntry: ["create"] }),
   ] as const,
   request: {
     body: {
@@ -72,7 +79,7 @@ const createTimeEntryRoute = createRoute({
     200: jsonResponse("The created time entry", timeEntrySchema),
     400: errorResponse("Invalid body or timestamps"),
     403: errorResponse(
-      "No access to the project, or missing task:update permission",
+      "No access to the project, or missing timeEntry:create permission",
     ),
     404: errorResponse("Task not found"),
   },
@@ -88,7 +95,7 @@ const updateTimeEntryRoute = createRoute({
     "Replace a time entry's start, end, and description. Setting endTime closes a running entry and fills in its duration.",
   middleware: [
     workspaceAccess.fromTimeEntry(),
-    requireWorkspacePermission({ task: ["update"] }),
+    requireWorkspacePermission({ timeEntry: ["update"] }),
   ] as const,
   request: {
     params: timeEntryParam,
@@ -101,13 +108,71 @@ const updateTimeEntryRoute = createRoute({
     200: jsonResponse("The updated time entry", timeEntrySchema),
     400: errorResponse("Invalid timestamps"),
     403: errorResponse(
-      "No access to the project, or missing task:update permission",
+      "No access to the project, or missing timeEntry:update permission",
     ),
     404: errorResponse("Time entry not found"),
   },
 });
 
+const getTaskTimeRoute = createRoute({
+  method: "get",
+  operationId: "getTaskTime",
+  path: "/task/{taskId}/total",
+  tags: ["Time Entries"],
+  summary: "Get the task's time total",
+  description:
+    "Read the manually editable task total in seconds. Running entries are excluded until stopped.",
+  middleware: [workspaceAccess.fromTaskId()] as const,
+  request: { params: taskIdParam },
+  responses: {
+    200: jsonResponse("Task time total", taskTimeSchema),
+    403: errorResponse("No access to the project"),
+    404: errorResponse("Task not found"),
+  },
+});
+
+const setTaskTimeRoute = createRoute({
+  method: "put",
+  operationId: "setTaskTime",
+  path: "/task/{taskId}/total",
+  tags: ["Time Entries"],
+  summary: "Set the task's time total",
+  description:
+    "Set an absolute total in seconds without deleting existing time entries. Subsequent time-entry changes adjust this total by their duration difference.",
+  middleware: [
+    workspaceAccess.fromTaskId(),
+    requireWorkspacePermission({ timeEntry: ["update"] }),
+  ] as const,
+  request: {
+    params: taskIdParam,
+    body: {
+      required: true,
+      content: { "application/json": { schema: setTaskTimeBody } },
+    },
+  },
+  responses: {
+    200: jsonResponse("Task time total", taskTimeSchema),
+    400: errorResponse("Invalid duration"),
+    403: errorResponse(
+      "No access to the project, or missing timeEntry:update permission",
+    ),
+    404: errorResponse("Task not found"),
+  },
+});
+
 const timeEntry = apiRouter()
+  .openapi(getTaskTimeRoute, async (c) =>
+    c.json(await getTaskTime(c.req.valid("param").taskId), 200),
+  )
+  .openapi(setTaskTimeRoute, async (c) =>
+    c.json(
+      await setTaskTime(
+        c.req.valid("param").taskId,
+        c.req.valid("json").totalSeconds,
+      ),
+      200,
+    ),
+  )
   .openapi(getTaskTimeEntriesRoute, async (c) =>
     c.json(await getTimeEntriesByTaskId(c.req.valid("param").taskId), 200),
   )

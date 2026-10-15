@@ -9,11 +9,20 @@ import {
 
 const mockSelect = vi.fn();
 const mockUpdate = vi.fn();
+const mockFindTask = vi.fn();
+const mockPublishEvent = vi.fn();
+
+vi.mock("../../../apps/api/src/events", () => ({
+  publishEvent: (...args: unknown[]) => mockPublishEvent(...args),
+}));
 
 vi.mock("../../../apps/api/src/database", () => ({
   default: {
     select: (...args: unknown[]) => mockSelect(...args),
     update: (...args: unknown[]) => mockUpdate(...args),
+    query: {
+      taskTable: { findFirst: (...args: unknown[]) => mockFindTask(...args) },
+    },
   },
 }));
 
@@ -37,6 +46,7 @@ function makeUpdateMock(updatedRow: unknown) {
 describe("updateTimeEntry", () => {
   beforeEach(() => {
     vi.resetAllMocks();
+    mockFindTask.mockResolvedValue({ projectId: "project-1" });
   });
 
   it("preserves a stored endTime and duration when endTime is omitted", async () => {
@@ -45,6 +55,7 @@ describe("updateTimeEntry", () => {
     const nextStartTime = new Date("2026-08-10T10:15:00.000Z");
     const updatedRow = {
       id: "time-entry-1",
+      taskId: "task-1",
       startTime: nextStartTime,
       endTime: storedEndTime,
       duration: 2700,
@@ -75,6 +86,11 @@ describe("updateTimeEntry", () => {
       endTime: storedEndTime,
       duration: 2700,
       description: "renamed",
+    });
+    expect(mockPublishEvent).toHaveBeenCalledWith("time-entry.updated", {
+      taskId: "task-1",
+      projectId: "project-1",
+      timeEntryId: "time-entry-1",
     });
   });
 
@@ -131,7 +147,10 @@ describe("updateTimeEntry", () => {
 
   it("still allows an open entry to have its startTime moved forward", async () => {
     const nextStartTime = new Date("2026-08-10T12:00:00.000Z");
-    const updateChain = makeUpdateMock({ id: "time-entry-1" });
+    const updateChain = makeUpdateMock({
+      id: "time-entry-1",
+      taskId: "task-1",
+    });
 
     mockSelect.mockReturnValue(
       makeSelectMock([

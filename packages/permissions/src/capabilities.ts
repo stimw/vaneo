@@ -11,6 +11,8 @@ export const workspaceCapabilities = {
   createTasks: { task: ["create"] },
   deleteTasks: { task: ["delete"] },
   assignTasks: { task: ["assign"] },
+  createTimeEntries: { timeEntry: ["create"] },
+  updateTimeEntries: { timeEntry: ["update"] },
   createLabels: { label: ["create"] },
   updateLabels: { label: ["update"] },
   deleteLabels: { label: ["delete"] },

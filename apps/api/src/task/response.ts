@@ -28,6 +28,10 @@ export const taskSchema = z
     priority: z.string().openapi({ description: priorityDescription }),
     startDate: nullableResponseTimestamp,
     dueDate: nullableResponseTimestamp,
+    trackedSeconds: z.number().optional().openapi({
+      description:
+        "Manually editable task time total in seconds, excluding running entries. Use the task time-total endpoints to read and set it.",
+    }),
     createdAt: responseTimestamp,
     customFields: z
       .array(z.object({ fieldId: z.string(), value: z.string() }))

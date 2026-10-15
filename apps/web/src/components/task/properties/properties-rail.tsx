@@ -20,6 +20,7 @@ import { LabelsValue } from "./labels-value";
 import { PropertyRow } from "./property-row";
 import { PropertyValue } from "./property-value";
 import { useTaskProperties } from "./use-task-properties";
+import { TaskTimePopover } from "../time-tracking/task-time-popover";
 
 type PropertiesRailProps = {
   taskId: string;
@@ -143,6 +144,10 @@ export function PropertiesRail({
               </PropertyValue>
             </TaskDueDatePopover>
           </div>
+        </PropertyRow>
+
+        <PropertyRow label={t("tasks:time.label")}>
+          <TaskTimePopover key={taskId} taskId={taskId} />
         </PropertyRow>
 
         <PropertyRow label={t("tasks:properties.project")}>

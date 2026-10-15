@@ -2165,6 +2165,16 @@
 						"label": "Delete roles",
 						"description": "Delete custom workspace roles."
 					}
+				},
+				"timeEntry": {
+					"create": {
+						"description": "Record time spent on tasks.",
+						"label": "Log time"
+					},
+					"update": {
+						"description": "Set task time totals and edit time entries.",
+						"label": "Edit time entries"
+					}
 				}
 			},
 			"resources": {
@@ -2176,7 +2186,8 @@
 				"member": "Members",
 				"invitation": "Invitations",
 				"team": "Teams",
-				"ac": "Roles and permissions"
+				"ac": "Roles and permissions",
+				"timeEntry": "Time entries"
 			},
 			"saveChanges": "Zapisz zmiany",
 			"sectionSubtitle": "Edytuj role domyślne lub dodaj własną. Członkowie zachowują przypisaną nazwę roli podczas edycji.",
@@ -3126,6 +3137,19 @@
 		},
 		"shared": {
 			"autosave": "Zmiany zapisują się automatycznie"
+		},
+		"timeReport": {
+			"description": "Export completed tasks and all their time entries for a period.",
+			"details": "Includes currently completed tasks and completed tasks that were archived. All recorded time is included; running timers are listed but excluded from totals.",
+			"download": "Download JSON",
+			"export": "Export completed tasks & time",
+			"exportError": "Could not export the time report.",
+			"from": "Completed from",
+			"invalidPeriod": "Select a valid completion date range.",
+			"timeZone": "Dates use {{timeZone}}. Both selected dates are included.",
+			"title": "Completed tasks & time",
+			"to": "Completed through",
+			"unknownDates": "{{count}} older tasks have unknown completion dates and were excluded."
 		}
 	},
 	"tasks": {
@@ -3661,6 +3685,15 @@
 			"markdownCopied": "Skopiowano jako Markdown",
 			"copyFailed": "Nie udało się skopiować do schowka.",
 			"pageUrlCopied": "Skopiowano URL strony"
+		},
+		"time": {
+			"label": "Time",
+			"hours": "Hours",
+			"save": "Save time",
+			"loadError": "Could not load time",
+			"retry": "Retry",
+			"saveError": "Could not save time",
+			"invalid": "Enter a valid, non-negative number of hours."
 		}
 	},
 	"press": {

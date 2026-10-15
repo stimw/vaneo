@@ -715,6 +715,24 @@ const taskUpdateEvents = [
   "comment.updated",
 ];
 
+for (const event of [
+  "time-entry.created",
+  "time-entry.updated",
+  "time-entry.total-updated",
+]) {
+  subscribeToEvent<{ taskId: string; projectId?: string }>(
+    event,
+    async (data) => {
+      if (data.projectId)
+        broadcastToProject(data.projectId, {
+          type: "TIME_ENTRY_UPDATED",
+          projectId: data.projectId,
+          taskId: data.taskId,
+        });
+    },
+  );
+}
+
 subscribeToEvent<{
   taskId: string;
   userId: string;

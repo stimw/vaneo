@@ -449,6 +449,27 @@
       "when": 1791727180448,
       "tag": "0063_import_runs",
       "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1791977900343,
+      "tag": "0064_task_completion",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1791979907994,
+      "tag": "0065_time_entry_permissions",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1791985250340,
+      "tag": "0066_task_time_total",
+      "breakpoints": true
     }
   ]
 }

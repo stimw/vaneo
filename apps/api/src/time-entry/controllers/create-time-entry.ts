@@ -41,13 +41,18 @@ async function createTimeEntry({
   }
 
   const [task] = await db
-    .select({ userId: taskTable.userId, title: taskTable.title })
+    .select({
+      userId: taskTable.userId,
+      title: taskTable.title,
+      projectId: taskTable.projectId,
+    })
     .from(taskTable)
     .where(eq(taskTable.id, taskId));
 
   await publishEvent("time-entry.created", {
     timeEntryId: createdTimeEntry.id,
     taskId: createdTimeEntry.taskId,
+    projectId: task?.projectId,
     userId,
     type: "create",
     content: "started time tracking",

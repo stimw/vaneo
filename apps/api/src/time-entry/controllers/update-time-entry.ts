@@ -1,7 +1,8 @@
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
-import { timeEntryTable } from "../../database/schema";
+import { taskTable, timeEntryTable } from "../../database/schema";
+import { publishEvent } from "../../events";
 import { resolveDuration } from "../duration";
 
 type UpdateTimeEntryParams = {
@@ -40,6 +41,18 @@ async function updateTimeEntry(params: UpdateTimeEntryParams) {
     .where(eq(timeEntryTable.id, timeEntryId))
     .returning();
 
+  if (!updatedTimeEntry)
+    throw new HTTPException(404, { message: "Time entry not found" });
+  const task = await db.query.taskTable.findFirst({
+    columns: { projectId: true },
+    where: eq(taskTable.id, updatedTimeEntry.taskId),
+  });
+  if (task)
+    await publishEvent("time-entry.updated", {
+      taskId: updatedTimeEntry.taskId,
+      projectId: task.projectId,
+      timeEntryId: updatedTimeEntry.id,
+    });
   return updatedTimeEntry;
 }
 

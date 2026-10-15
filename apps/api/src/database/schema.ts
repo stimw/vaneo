@@ -1,6 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import { relations, sql } from "drizzle-orm";
 import {
+  bigint,
   boolean,
   customType,
   foreignKey,
@@ -551,6 +552,10 @@ export const taskTable = pgTable(
     priority: text("priority").default("low").notNull(),
     startDate: timestamp("start_date", { mode: "date" }),
     dueDate: timestamp("due_date", { mode: "date" }),
+    completedAt: timestamp("completed_at", { mode: "date" }),
+    trackedSeconds: bigint("tracked_seconds", { mode: "number" })
+      .default(0)
+      .notNull(),
     createdAt: timestamp("created_at", { mode: "date" })
       .default(utcNow)
       .notNull(),
@@ -567,6 +572,10 @@ export const taskTable = pgTable(
         sql`${table.startDate} is not null or ${table.dueDate} is not null`,
       ),
     index("task_dueDate_idx").on(table.dueDate),
+    index("task_project_completed_at_idx").on(
+      table.projectId,
+      table.completedAt,
+    ),
     index("task_assigneeId_idx").on(table.userId),
     index("task_columnId_idx").on(table.columnId),
     unique("task_project_number_unique").on(table.projectId, table.number),

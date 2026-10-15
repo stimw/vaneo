@@ -1,4 +1,7 @@
 import { nullableResponseTimestamp, responseTimestamp, z } from "../openapi";
+export const taskTimeSchema = z
+  .object({ taskId: z.string(), totalSeconds: z.number() })
+  .openapi("TaskTimeTotal");
 
 export const timeEntrySchema = z
   .object({

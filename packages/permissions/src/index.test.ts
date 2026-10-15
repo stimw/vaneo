@@ -28,6 +28,7 @@ describe("@kaneo/permissions statement surface", () => {
       "assign",
     ]);
     expect(statement.label).toEqual(["create", "read", "update", "delete"]);
+    expect(statement.timeEntry).toEqual(["create", "update"]);
     expect(statement.workspace).toEqual([
       "read",
       "update",
@@ -48,6 +49,12 @@ describe("@kaneo/permissions statement surface", () => {
 });
 
 describe("built-in role privileges", () => {
+  it("grants time writes to team roles and keeps viewers read-only", () => {
+    for (const role of [member, admin, owner]) {
+      expect(role.statements.timeEntry).toEqual(["create", "update"]);
+    }
+    expect(viewer.statements).not.toHaveProperty("timeEntry");
+  });
   it("viewer can read but cannot create or modify", () => {
     expect(viewer.statements.project).toEqual(["read"]);
     expect(viewer.statements.task).toEqual(["read"]);

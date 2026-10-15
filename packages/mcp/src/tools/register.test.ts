@@ -30,6 +30,27 @@ function createServerMock() {
 }
 
 describe("registerTools", () => {
+  it("exports a completion period without filtering away time outside that period", async () => {
+    const { server, tools } = createServerMock();
+    const report = { tasks: [], summary: { taskCount: 0, totalSeconds: 0 } };
+    const client = { json: vi.fn().mockResolvedValue(report) };
+    registerTools(server as never, { client: client as never });
+    const args = {
+      projectId: "project 1",
+      from: "2026-10-01T00:00:00Z",
+      to: "2026-11-01T00:00:00Z",
+      timeZone: "Australia/Brisbane",
+    };
+    const result = await tools.get("export_completed_tasks")?.handler(args);
+    const called = new URL(client.json.mock.calls[0][0], "https://example.com");
+    expect(called.pathname).toBe("/api/task/completed-export/project%201");
+    expect(Object.fromEntries(called.searchParams)).toEqual({
+      from: args.from,
+      to: args.to,
+      timeZone: args.timeZone,
+    });
+    expect(result?.isError).toBe(false);
+  });
   it("registers the MCP tools", () => {
     const { server } = createServerMock();
     const client = { json: vi.fn() };
@@ -46,6 +67,25 @@ describe("registerTools", () => {
       "update_task",
       expect.any(Object),
       expect.any(Function),
+    );
+  });
+
+  it("reads and sets the absolute task time total using the dedicated endpoints", async () => {
+    const { server, tools } = createServerMock();
+    const client = {
+      json: vi.fn().mockResolvedValue({ taskId: "task 1", totalSeconds: 9000 }),
+    };
+    registerTools(server as never, { client: client as never });
+    await tools.get("get_task_time")?.handler({ taskId: "task 1" });
+    expect(client.json).toHaveBeenLastCalledWith(
+      "/api/time-entry/task/task%201/total",
+    );
+    await tools
+      .get("set_task_time")
+      ?.handler({ taskId: "task 1", totalSeconds: 9000 });
+    expect(client.json).toHaveBeenLastCalledWith(
+      "/api/time-entry/task/task%201/total",
+      { method: "PUT", body: JSON.stringify({ totalSeconds: 9000 }) },
     );
   });
 

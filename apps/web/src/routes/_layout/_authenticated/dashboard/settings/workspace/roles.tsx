@@ -68,6 +68,7 @@ const RESOURCE_LABELS: Record<string, string> = {
   ac: "Roles and permissions",
   project: "Projects",
   task: "Tasks",
+  timeEntry: "Time entries",
   label: "Labels",
   workspace: "Workspace",
 };
@@ -172,6 +173,14 @@ const PERMISSION_LABELS: Record<
   "task:assign": {
     label: "Assign tasks",
     description: "Assign tasks to other workspace members.",
+  },
+  "timeEntry:create": {
+    label: "Log time",
+    description: "Record time spent on tasks.",
+  },
+  "timeEntry:update": {
+    label: "Edit time entries",
+    description: "Set task time totals and edit time entries.",
   },
   "label:create": {
     label: "Create labels",

@@ -168,9 +168,21 @@ it("reconciles the initial handshake after active pagination completes", async (
     query: { queryKey: ["tasks", "p"], state: { fetchStatus: "idle" } },
   });
   await Promise.resolve();
-  expect(mocks.client.invalidateQueries).toHaveBeenCalledExactlyOnceWith({
+  expect(mocks.client.invalidateQueries).toHaveBeenCalledWith({
     queryKey: ["tasks", "p"],
   });
+  expect(mocks.client.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: ["time-entries"],
+  });
+});
+
+it("refreshes time entries without reloading the board", () => {
+  renderHook(() => useProjectWebSocket("p"));
+  Socket.current.message("TIME_ENTRY_UPDATED", { taskId: "a" });
+  expect(mocks.client.invalidateQueries).toHaveBeenCalledExactlyOnceWith({
+    queryKey: ["time-entries", "a"],
+  });
+  expect(mocks.getTask).not.toHaveBeenCalled();
 });
 it("preserves distinct task effects across pagination and a disconnect before replay", async () => {
   vi.useFakeTimers();

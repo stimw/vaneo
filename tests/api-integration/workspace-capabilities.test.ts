@@ -121,6 +121,8 @@ it("reports every capability for the caller's role in one response", async () =>
   expect(triageCapabilities).toMatchObject({
     createTasks: true,
     updateTasks: true,
+    createTimeEntries: false,
+    updateTimeEntries: false,
     deleteTasks: false,
     createProjects: false,
   });

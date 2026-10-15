@@ -10,6 +10,7 @@ export const statement = {
   ...defaultStatements,
   project: ["create", "read", "update", "delete", "share"],
   task: ["create", "read", "update", "delete", "assign"],
+  timeEntry: ["create", "update"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
 } as const;
@@ -28,6 +29,7 @@ export const member = ac.newRole({
   ...memberAc.statements,
   project: ["create", "read"],
   task: ["create", "read", "update"],
+  timeEntry: ["create", "update"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read"],
 });
@@ -36,6 +38,7 @@ export const admin = ac.newRole({
   ...adminAc.statements,
   project: ["create", "read", "update", "delete", "share"],
   task: ["create", "read", "update", "delete", "assign"],
+  timeEntry: ["create", "update"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "manage_settings"],
 });
@@ -44,6 +47,7 @@ export const owner = ac.newRole({
   ...ownerAc.statements,
   project: ["create", "read", "update", "delete", "share"],
   task: ["create", "read", "update", "delete", "assign"],
+  timeEntry: ["create", "update"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
 });

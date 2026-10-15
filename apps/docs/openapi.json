@@ -1229,6 +1229,10 @@
             ],
             "format": "date-time"
           },
+          "trackedSeconds": {
+            "type": "number",
+            "description": "Manually editable task time total in seconds, excluding running entries. Use the task time-total endpoints to read and set it."
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time"
@@ -1494,6 +1498,238 @@
         "required": [
           "name",
           "color"
+        ]
+      },
+      "CompletedTasksTimeReport": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "number",
+            "enum": [
+              1
+            ]
+          },
+          "exportedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "project": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "slug"
+            ]
+          },
+          "period": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "to": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timeZone": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "timeZone"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "taskCount": {
+                "type": "number"
+              },
+              "totalSeconds": {
+                "type": "number"
+              },
+              "runningEntryCount": {
+                "type": "number"
+              },
+              "unknownCompletionCount": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "taskCount",
+              "totalSeconds",
+              "runningEntryCount",
+              "unknownCompletionCount"
+            ]
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "ticketId": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "status": {
+                  "type": "string"
+                },
+                "completedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "assigneeId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "assigneeName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "totalSeconds": {
+                  "type": "number"
+                },
+                "timeEntries": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TimeEntryWithUser"
+                  }
+                }
+              },
+              "required": [
+                "id",
+                "ticketId",
+                "title",
+                "description",
+                "status",
+                "completedAt",
+                "assigneeId",
+                "assigneeName",
+                "totalSeconds",
+                "timeEntries"
+              ]
+            }
+          }
+        },
+        "required": [
+          "version",
+          "exportedAt",
+          "project",
+          "period",
+          "summary",
+          "tasks"
+        ]
+      },
+      "TimeEntryWithUser": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TimeEntry"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "userName": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "userName"
+            ]
+          }
+        ]
+      },
+      "TimeEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "taskId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Null once the user who logged the time has been removed."
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Null while the timer is still running."
+          },
+          "duration": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "description": "Elapsed seconds, filled in once the entry has an endTime."
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "taskId",
+          "userId",
+          "description",
+          "startTime",
+          "endTime",
+          "duration",
+          "createdAt",
+          "updatedAt"
         ]
       },
       "TaskImportResult": {
@@ -1812,87 +2048,19 @@
           "image"
         ]
       },
-      "TimeEntryWithUser": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/TimeEntry"
-          },
-          {
-            "type": "object",
-            "properties": {
-              "userName": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              }
-            },
-            "required": [
-              "userName"
-            ]
-          }
-        ]
-      },
-      "TimeEntry": {
+      "TaskTimeTotal": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string"
-          },
           "taskId": {
             "type": "string"
           },
-          "userId": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Null once the user who logged the time has been removed."
-          },
-          "description": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "startTime": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "endTime": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time",
-            "description": "Null while the timer is still running."
-          },
-          "duration": {
-            "type": [
-              "number",
-              "null"
-            ],
-            "description": "Elapsed seconds, filled in once the entry has an endTime."
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
+          "totalSeconds": {
+            "type": "number"
           }
         },
         "required": [
-          "id",
           "taskId",
-          "userId",
-          "description",
-          "startTime",
-          "endTime",
-          "duration",
-          "createdAt",
-          "updatedAt"
+          "totalSeconds"
         ]
       },
       "Label": {
@@ -4497,6 +4665,12 @@
           "assignTasks": {
             "type": "boolean"
           },
+          "createTimeEntries": {
+            "type": "boolean"
+          },
+          "updateTimeEntries": {
+            "type": "boolean"
+          },
           "createLabels": {
             "type": "boolean"
           },
@@ -4538,6 +4712,8 @@
           "createTasks",
           "deleteTasks",
           "assignTasks",
+          "createTimeEntries",
+          "updateTimeEntries",
           "createLabels",
           "updateLabels",
           "deleteLabels",
@@ -12048,6 +12224,115 @@
         }
       }
     },
+    "/task/completed-export/{projectId}": {
+      "get": {
+        "operationId": "exportCompletedTasks",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Export completed tasks and all their time entries",
+        "description": "Currently completed tasks, including completed tasks that were archived, whose most recent completion falls in [from, to). Totals use the editable task time total, including manual corrections. Historical time entries are included even outside the period; their sum may differ from a corrected total. Running entries are listed but excluded until stopped. Historical tasks with unknown completion dates are counted separately. Completion follows the project's final workflow columns.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-01-31T09:00:00Z",
+              "description": "Inclusive completion timestamp."
+            },
+            "required": true,
+            "description": "Inclusive completion timestamp.",
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-01-31T09:00:00Z",
+              "description": "Exclusive completion timestamp."
+            },
+            "required": true,
+            "description": "Exclusive completion timestamp.",
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": "UTC"
+            },
+            "required": false,
+            "name": "timeZone",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completed tasks and time report",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompletedTasksTimeReport"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid period or report too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No access to the project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/task/import/{projectId}": {
       "post": {
         "operationId": "importTasks",
@@ -14293,6 +14578,164 @@
         }
       }
     },
+    "/time-entry/task/{taskId}/total": {
+      "get": {
+        "operationId": "getTaskTime",
+        "tags": [
+          "Time Entries"
+        ],
+        "summary": "Get the task's time total",
+        "description": "Read the manually editable task total in seconds. Running entries are excluded until stopped.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "taskId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task time total",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskTimeTotal"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No access to the project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      },
+      "put": {
+        "operationId": "setTaskTime",
+        "tags": [
+          "Time Entries"
+        ],
+        "summary": "Set the task's time total",
+        "description": "Set an absolute total in seconds without deleting existing time entries. Subsequent time-entry changes adjust this total by their duration difference.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "taskId",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "totalSeconds": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 2147483647
+                  }
+                },
+                "required": [
+                  "totalSeconds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Task time total",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskTimeTotal"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid duration",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No access to the project, or missing timeEntry:update permission",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Task not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
     "/time-entry/task/{taskId}": {
       "get": {
         "operationId": "getTaskTimeEntries",
@@ -14502,7 +14945,7 @@
             }
           },
           "403": {
-            "description": "No access to the project, or missing task:update permission",
+            "description": "No access to the project, or missing timeEntry:update permission",
             "content": {
               "application/json": {
                 "schema": {
@@ -14600,7 +15043,7 @@
             }
           },
           "403": {
-            "description": "No access to the project, or missing task:update permission",
+            "description": "No access to the project, or missing timeEntry:create permission",
             "content": {
               "application/json": {
                 "schema": {

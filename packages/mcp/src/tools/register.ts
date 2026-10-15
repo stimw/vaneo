@@ -785,6 +785,43 @@ export function registerTools(
   );
 
   registerTool(
+    "get_task_time",
+    {
+      description:
+        "Get the task's time total in seconds, including manual corrections. Running entries are excluded until stopped.",
+      inputSchema: z.object({ taskId: nonEmptyString }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/time-entry/task/${encodeURIComponent(args.taskId)}/total`,
+        ),
+      ),
+  );
+
+  registerTool(
+    "set_task_time",
+    {
+      description:
+        "Set the task's absolute time total in seconds. Existing time entries are preserved. Requires timeEntry:update permission.",
+      inputSchema: z.object({
+        taskId: nonEmptyString,
+        totalSeconds: z.number().int().min(0).max(2_147_483_647),
+      }),
+    },
+    async (args) =>
+      run(() =>
+        client.json(
+          `/api/time-entry/task/${encodeURIComponent(args.taskId)}/total`,
+          {
+            method: "PUT",
+            body: JSON.stringify({ totalSeconds: args.totalSeconds }),
+          },
+        ),
+      ),
+  );
+
+  registerTool(
     "get_time_entry",
     {
       description: "Get a single time entry by ID.",
@@ -864,5 +901,30 @@ export function registerTools(
       inputSchema: z.object({}),
     },
     async () => run(() => client.json("/api/notification")),
+  );
+
+  registerTool(
+    "export_completed_tasks",
+    {
+      description:
+        "Export tasks completed in [from, to), including completed archived tasks and all of their time entries. Running entries are listed but excluded from totals; unknown historical completion dates are reported separately.",
+      inputSchema: z.object({
+        projectId: nonEmptyString,
+        from: isoDateTimeSchema,
+        to: isoDateTimeSchema,
+        timeZone: optionalNonEmptyString,
+      }),
+    },
+    async ({ projectId, from, to, timeZone }) =>
+      run(() => {
+        const query = new URLSearchParams({
+          from,
+          to,
+          ...(timeZone ? { timeZone } : {}),
+        });
+        return client.json(
+          `/api/task/completed-export/${encodeURIComponent(projectId)}?${query.toString()}`,
+        );
+      }),
   );
 }

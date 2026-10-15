@@ -4524,6 +4524,9 @@
 								},
 								"ac": {
 									"type": "string"
+								},
+								"timeEntry": {
+									"type": "string"
 								}
 							},
 							"required": [
@@ -4535,7 +4538,8 @@
 								"member",
 								"invitation",
 								"team",
-								"ac"
+								"ac",
+								"timeEntry"
 							]
 						},
 						"permissions": {
@@ -5020,6 +5024,39 @@
 										}
 									},
 									"required": ["create", "read", "update", "delete"]
+								},
+								"timeEntry": {
+									"type": "object",
+									"properties": {
+										"create": {
+											"type": "object",
+											"properties": {
+												"label": {
+													"type": "string"
+												},
+												"description": {
+													"type": "string"
+												}
+											},
+											"required": ["label", "description"],
+											"additionalProperties": false
+										},
+										"update": {
+											"type": "object",
+											"properties": {
+												"label": {
+													"type": "string"
+												},
+												"description": {
+													"type": "string"
+												}
+											},
+											"required": ["label", "description"],
+											"additionalProperties": false
+										}
+									},
+									"required": ["create", "update"],
+									"additionalProperties": false
 								}
 							},
 							"required": [
@@ -5031,7 +5068,8 @@
 								"member",
 								"invitation",
 								"team",
-								"ac"
+								"ac",
+								"timeEntry"
 							]
 						},
 						"validation": {
@@ -10005,6 +10043,75 @@
 						"expiredCallout",
 						"openFailed"
 					]
+				},
+				"timeReport": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"description": {
+							"type": "string"
+						},
+						"details": {
+							"type": "string"
+						},
+						"from": {
+							"type": "string"
+						},
+						"to": {
+							"type": "string"
+						},
+						"timeZone": {
+							"type": "string"
+						},
+						"download": {
+							"type": "string"
+						},
+						"invalidPeriod": {
+							"type": "string"
+						},
+						"exportError": {
+							"type": "string"
+						},
+						"unknownDates": {
+							"type": "string"
+						},
+						"unknownDates_zero": {
+							"type": "string"
+						},
+						"unknownDates_one": {
+							"type": "string"
+						},
+						"unknownDates_two": {
+							"type": "string"
+						},
+						"unknownDates_few": {
+							"type": "string"
+						},
+						"unknownDates_many": {
+							"type": "string"
+						},
+						"unknownDates_other": {
+							"type": "string"
+						},
+						"export": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"description",
+						"details",
+						"from",
+						"to",
+						"timeZone",
+						"download",
+						"invalidPeriod",
+						"exportError",
+						"export"
+					]
 				}
 			},
 			"required": [
@@ -10052,7 +10159,8 @@
 				"securityPage",
 				"calendarFeeds",
 				"invitationEmailFailed",
-				"billing"
+				"billing",
+				"timeReport"
 			]
 		},
 		"navigation": {
@@ -13377,6 +13485,42 @@
 						}
 					},
 					"required": ["reorderFailed"]
+				},
+				"time": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"label": {
+							"type": "string"
+						},
+						"hours": {
+							"type": "string"
+						},
+						"save": {
+							"type": "string"
+						},
+						"loadError": {
+							"type": "string"
+						},
+						"retry": {
+							"type": "string"
+						},
+						"saveError": {
+							"type": "string"
+						},
+						"invalid": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"label",
+						"hours",
+						"save",
+						"loadError",
+						"retry",
+						"saveError",
+						"invalid"
+					]
 				}
 			},
 			"required": [
@@ -13419,7 +13563,8 @@
 				"descriptionRetry",
 				"descriptionLoading",
 				"descriptionLoadError",
-				"board"
+				"board",
+				"time"
 			]
 		},
 		"invitations": {

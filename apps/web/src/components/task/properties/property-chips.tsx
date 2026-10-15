@@ -19,6 +19,7 @@ import { AssigneeAvatar } from "./assignee-avatar";
 import { dueDateTextClass } from "./due-date-text-class";
 import { LabelsValue } from "./labels-value";
 import { useTaskProperties } from "./use-task-properties";
+import { TaskTimePopover } from "../time-tracking/task-time-popover";
 
 type PropertyChipsProps = {
   taskId: string;
@@ -141,6 +142,11 @@ export function PropertyChips({
         </TaskLabelsPopover>
       </div>
       <div className="flex flex-wrap items-center gap-1.5">
+        <TaskTimePopover
+          key={taskId}
+          taskId={taskId}
+          className={cn(chip, "flex-none")}
+        />
         {canMoveTask ? (
           <TaskMovePopover task={task} workspaceId={workspaceId}>
             <button type="button" data-task-action="move" className={chip}>
