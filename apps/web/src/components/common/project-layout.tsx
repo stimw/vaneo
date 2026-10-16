@@ -34,6 +34,7 @@ type ProjectLayoutProps = {
   projectId: string;
   workspaceId: string;
   toolbar?: ReactNode;
+  toolbarClassName?: string;
   summary?: ReactNode;
   filterBar?: ReactNode;
   children: ReactNode;
@@ -45,6 +46,7 @@ export default function ProjectLayout({
   projectId,
   workspaceId,
   toolbar,
+  toolbarClassName,
   summary,
   filterBar,
   children,
@@ -68,13 +70,15 @@ export default function ProjectLayout({
 
   const resolvedRoute: ProjectRoute =
     activeView ??
-    (location.pathname.includes("/backlog")
-      ? "backlog"
-      : location.pathname.includes("/calendar")
-        ? "calendar"
-        : location.pathname.includes("/gantt")
-          ? "gantt"
-          : "board");
+    (location.pathname.includes("/reports")
+      ? "reports"
+      : location.pathname.includes("/backlog")
+        ? "backlog"
+        : location.pathname.includes("/calendar")
+          ? "calendar"
+          : location.pathname.includes("/gantt")
+            ? "gantt"
+            : "board");
   const currentView = resolveProjectView(resolvedRoute, viewMode);
   const showViews = showViewSwitcher && !unavailableReason;
 
@@ -149,6 +153,7 @@ export default function ProjectLayout({
             className={cn(
               "flex h-11 shrink-0 items-center gap-2.5 border-border/80 border-b px-2 sm:px-3",
               { "bg-card/80 backdrop-blur": !!background },
+              toolbarClassName,
             )}
           >
             {showViewSwitcher && (

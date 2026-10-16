@@ -188,6 +188,20 @@ export function useProjectWebSocket(projectId: string) {
         if (disposed || activeSocket !== ws) return;
         try {
           const message = JSON.parse(event.data);
+          if (
+            [
+              "TIME_ENTRY_UPDATED",
+              "TASK_UPDATED",
+              "TASK_CREATED",
+              "TASK_DELETED",
+              "TASK_MOVED",
+              "PROJECT_UPDATED",
+            ].includes(message.type)
+          ) {
+            void queryClient.invalidateQueries({
+              queryKey: ["completed-reports", projectId],
+            });
+          }
           if (message.type === "TIME_ENTRY_UPDATED" && message.taskId) {
             void queryClient.invalidateQueries({
               queryKey: ["time-entries", message.taskId],
@@ -601,6 +615,9 @@ export function useProjectWebSocket(projectId: string) {
           return;
         if (needsReconcile) {
           needsReconcile = false;
+          void queryClient.invalidateQueries({
+            queryKey: ["completed-reports", projectId],
+          });
           void queryClient.invalidateQueries({ queryKey: ["time-entries"] });
           markBoardCacheChanged(queryClient, projectId);
           void queryClient.invalidateQueries({

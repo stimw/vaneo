@@ -13521,6 +13521,250 @@
 						"saveError",
 						"invalid"
 					]
+				},
+				"reports": {
+					"type": "object",
+					"additionalProperties": false,
+					"properties": {
+						"title": {
+							"type": "string"
+						},
+						"changePeriod": {
+							"type": "string"
+						},
+						"thisMonth": {
+							"type": "string"
+						},
+						"last7Days": {
+							"type": "string"
+						},
+						"last30Days": {
+							"type": "string"
+						},
+						"lastMonth": {
+							"type": "string"
+						},
+						"customRange": {
+							"type": "string"
+						},
+						"bothDatesIncluded": {
+							"type": "string"
+						},
+						"apply": {
+							"type": "string"
+						},
+						"periodSummary": {
+							"type": "string"
+						},
+						"completedTaskTime": {
+							"type": "string"
+						},
+						"completedTasks": {
+							"type": "string"
+						},
+						"completionActivity": {
+							"type": "string"
+						},
+						"groupedByCompletionDate": {
+							"type": "string"
+						},
+						"chartMeasure": {
+							"type": "string"
+						},
+						"hours": {
+							"type": "string"
+						},
+						"tasks": {
+							"type": "string"
+						},
+						"chartDescription": {
+							"type": "string"
+						},
+						"mostTime": {
+							"type": "string"
+						},
+						"shareOfPeriodTime": {
+							"type": "string"
+						},
+						"noTimeYet": {
+							"type": "string"
+						},
+						"taskDetails": {
+							"type": "string"
+						},
+						"clearDateFilter": {
+							"type": "string"
+						},
+						"clearZeroFilter": {
+							"type": "string"
+						},
+						"zeroHours": {
+							"type": "string"
+						},
+						"searchTasks": {
+							"type": "string"
+						},
+						"task": {
+							"type": "string"
+						},
+						"assignee": {
+							"type": "string"
+						},
+						"completed": {
+							"type": "string"
+						},
+						"time": {
+							"type": "string"
+						},
+						"unassigned": {
+							"type": "string"
+						},
+						"noTasks": {
+							"type": "string"
+						},
+						"tryDifferentFilters": {
+							"type": "string"
+						},
+						"showingTasks": {
+							"type": "string"
+						},
+						"viewTotal": {
+							"type": "string"
+						},
+						"exportView": {
+							"type": "string"
+						},
+						"exportCsv": {
+							"type": "string"
+						},
+						"exportJson": {
+							"type": "string"
+						},
+						"howCalculated": {
+							"type": "string"
+						},
+						"calculationDetails": {
+							"type": "string"
+						},
+						"updatedAt": {
+							"type": "string"
+						},
+						"updateFailed": {
+							"type": "string"
+						},
+						"refresh": {
+							"type": "string"
+						},
+						"loadFailed": {
+							"type": "string"
+						},
+						"retry": {
+							"type": "string"
+						},
+						"timeZone": {
+							"type": "string"
+						},
+						"currentTotals": {
+							"type": "string"
+						},
+						"unknownDates": {
+							"type": "string"
+						},
+						"averageTime": {
+							"type": "string"
+						},
+						"zeroCount": {
+							"type": "string"
+						},
+						"zeroCount_zero": {
+							"type": "string"
+						},
+						"zeroCount_one": {
+							"type": "string"
+						},
+						"zeroCount_two": {
+							"type": "string"
+						},
+						"zeroCount_few": {
+							"type": "string"
+						},
+						"zeroCount_many": {
+							"type": "string"
+						},
+						"zeroCount_other": {
+							"type": "string"
+						},
+						"rowRange": {
+							"type": "string"
+						},
+						"rowsPerPage": {
+							"type": "string"
+						},
+						"pageOf": {
+							"type": "string"
+						},
+						"loadingTasks": {
+							"type": "string"
+						},
+						"exportFailed": {
+							"type": "string"
+						}
+					},
+					"required": [
+						"title",
+						"changePeriod",
+						"thisMonth",
+						"last7Days",
+						"last30Days",
+						"lastMonth",
+						"customRange",
+						"bothDatesIncluded",
+						"apply",
+						"periodSummary",
+						"completedTaskTime",
+						"completedTasks",
+						"completionActivity",
+						"groupedByCompletionDate",
+						"chartMeasure",
+						"hours",
+						"tasks",
+						"chartDescription",
+						"mostTime",
+						"shareOfPeriodTime",
+						"noTimeYet",
+						"taskDetails",
+						"clearDateFilter",
+						"clearZeroFilter",
+						"zeroHours",
+						"searchTasks",
+						"task",
+						"assignee",
+						"completed",
+						"time",
+						"unassigned",
+						"noTasks",
+						"tryDifferentFilters",
+						"showingTasks",
+						"viewTotal",
+						"exportView",
+						"exportCsv",
+						"exportJson",
+						"howCalculated",
+						"calculationDetails",
+						"updatedAt",
+						"updateFailed",
+						"refresh",
+						"loadFailed",
+						"retry",
+						"timeZone",
+						"currentTotals",
+						"averageTime",
+						"rowRange",
+						"rowsPerPage",
+						"pageOf",
+						"loadingTasks",
+						"exportFailed"
+					]
 				}
 			},
 			"required": [
@@ -13564,7 +13808,8 @@
 				"descriptionLoading",
 				"descriptionLoadError",
 				"board",
-				"time"
+				"time",
+				"reports"
 			]
 		},
 		"invitations": {

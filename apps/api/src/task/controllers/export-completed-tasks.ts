@@ -1,4 +1,4 @@
-import { and, asc, count, eq, gte, inArray, isNull, lt, or } from "drizzle-orm";
+import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
 import {
@@ -8,10 +8,19 @@ import {
   userTable,
 } from "../../database/schema";
 import { taskIsCompleted } from "../task-is-completed";
+import type { CompletedReportFilters } from "../completed-report-schema";
+import {
+  reportFilterWhere,
+  reportOrder,
+  reportPeriodWhere,
+} from "../report-task-query";
 
 export default async function exportCompletedTasks(
   projectId: string,
   period: { from: string; to: string; timeZone: string },
+  filters: Partial<
+    Pick<CompletedReportFilters, "search" | "day" | "zeroOnly" | "sort">
+  > = {},
 ) {
   // A report must describe one snapshot even if tasks/timers change mid-export.
   return db.transaction(
@@ -38,16 +47,25 @@ export default async function exportCompletedTasks(
         .leftJoin(userTable, eq(taskTable.userId, userTable.id))
         .where(
           and(
-            eq(taskTable.projectId, projectId),
-            or(taskIsCompleted, eq(taskTable.status, "archived")),
-            gte(taskTable.completedAt, new Date(period.from)),
-            lt(taskTable.completedAt, new Date(period.to)),
+            reportPeriodWhere(projectId, period),
+            reportFilterWhere(project.slug, {
+              search: filters.search ?? "",
+              day: filters.day,
+              timeZone: period.timeZone,
+            }),
+            filters.zeroOnly === "true"
+              ? eq(taskTable.trackedSeconds, 0)
+              : undefined,
           ),
         )
         .orderBy(
-          asc(taskTable.completedAt),
-          asc(taskTable.number),
-          asc(taskTable.id),
+          ...(filters.sort
+            ? reportOrder(filters.sort)
+            : [
+                asc(taskTable.completedAt),
+                asc(taskTable.number),
+                asc(taskTable.id),
+              ]),
         )
         .limit(10_001);
       if (rows.length > 10_000)
@@ -105,7 +123,7 @@ export default async function exportCompletedTasks(
         exportedAt: new Date(),
         project,
         period: {
-          ...period,
+          timeZone: period.timeZone,
           from: new Date(period.from),
           to: new Date(period.to),
         },

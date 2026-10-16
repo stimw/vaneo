@@ -41,6 +41,14 @@ import deleteTask from "./controllers/delete-task";
 import duplicateTask from "./controllers/duplicate-task";
 import exportTasks from "./controllers/export-tasks";
 import exportCompletedTasks from "./controllers/export-completed-tasks";
+import getCompletedReport from "./controllers/get-completed-report";
+import getCompletedReportPage from "./controllers/get-completed-report-page";
+import {
+  completedReportExportQuery,
+  completedReportPageQuery,
+  completedReportPageSchema,
+  completedReportSummarySchema,
+} from "./completed-report-schema";
 import {
   completedExportQuery,
   completedExportSchema,
@@ -474,10 +482,55 @@ const exportCompletedTasksRoute = createRoute({
     workspaceAccess.fromProject("projectId"),
     requireWorkspacePermission({ task: ["read"] }),
   ] as const,
-  request: { params: projectIdParam, query: completedExportQuery },
+  request: { params: projectIdParam, query: completedReportExportQuery },
   responses: {
     200: jsonResponse("Completed tasks and time report", completedExportSchema),
     400: errorResponse("Invalid period or report too large"),
+    403: errorResponse("No access to the project"),
+    404: errorResponse("Project not found"),
+  },
+});
+
+const completedReportRoute = createRoute({
+  method: "get",
+  operationId: "getCompletedReport",
+  path: "/completed-report/{projectId}",
+  tags: ["Tasks"],
+  summary: "Get completed task time aggregates",
+  description:
+    "Period totals, daily activity in the supplied time zone, and three tasks with the most time. Uses current corrected task totals grouped by completion date. Includes completed archived tasks; reopened tasks are excluded. Does not load descriptions or time entries.",
+  middleware: [
+    workspaceAccess.fromProject("projectId"),
+    requireWorkspacePermission({ task: ["read"] }),
+  ] as const,
+  request: { params: projectIdParam, query: completedExportQuery },
+  responses: {
+    200: jsonResponse(
+      "Completion report summary",
+      completedReportSummarySchema,
+    ),
+    400: errorResponse("Invalid period"),
+    403: errorResponse("No access to the project"),
+    404: errorResponse("Project not found"),
+  },
+});
+
+const completedReportPageRoute = createRoute({
+  method: "get",
+  operationId: "getCompletedReportPage",
+  path: "/completed-report/{projectId}/tasks",
+  tags: ["Tasks"],
+  summary: "Get a page of completed report tasks",
+  description:
+    "Server-side search, completion-day and zero-hour filtering, ordered by completion or corrected time descending, then task number and ID. Summary totals cover all matching tasks, independent of pagination. Returns at most 100 lightweight tasks; descriptions and time entries are not loaded.",
+  middleware: [
+    workspaceAccess.fromProject("projectId"),
+    requireWorkspacePermission({ task: ["read"] }),
+  ] as const,
+  request: { params: projectIdParam, query: completedReportPageQuery },
+  responses: {
+    200: jsonResponse("Completion report task page", completedReportPageSchema),
+    400: errorResponse("Invalid period or pagination"),
     403: errorResponse("No access to the project"),
     404: errorResponse("Project not found"),
   },
@@ -1042,6 +1095,25 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
   .openapi(exportCompletedTasksRoute, async (c) =>
     c.json(
       await exportCompletedTasks(
+        c.req.valid("param").projectId,
+        c.req.valid("query"),
+        c.req.valid("query"),
+      ),
+      200,
+    ),
+  )
+  .openapi(completedReportRoute, async (c) =>
+    c.json(
+      await getCompletedReport(
+        c.req.valid("param").projectId,
+        c.req.valid("query"),
+      ),
+      200,
+    ),
+  )
+  .openapi(completedReportPageRoute, async (c) =>
+    c.json(
+      await getCompletedReportPage(
         c.req.valid("param").projectId,
         c.req.valid("query"),
       ),

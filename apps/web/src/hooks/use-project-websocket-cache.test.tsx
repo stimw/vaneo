@@ -134,7 +134,9 @@ describe("board realtime races", () => {
     Socket.current.message("TASK_UPDATED", { taskId: "a" });
     Socket.current.message("TASK_UPDATED", { taskId: "a" });
     expect(mocks.getTask).not.toHaveBeenCalled();
-    expect(mocks.client.invalidateQueries).not.toHaveBeenCalled();
+    expect(mocks.client.invalidateQueries).not.toHaveBeenCalledWith({
+      queryKey: ["tasks", "p"],
+    });
     mocks.client.getQueryState.mockReturnValue({ fetchStatus: "idle" });
     mocks.subscribe.mock.calls[0][0]({
       query: { queryKey: ["tasks", "p"], state: { fetchStatus: "idle" } },
@@ -176,11 +178,17 @@ it("reconciles the initial handshake after active pagination completes", async (
   });
 });
 
-it("refreshes time entries without reloading the board", () => {
+it("refreshes task time and project reports without reloading the board", () => {
   renderHook(() => useProjectWebSocket("p"));
   Socket.current.message("TIME_ENTRY_UPDATED", { taskId: "a" });
-  expect(mocks.client.invalidateQueries).toHaveBeenCalledExactlyOnceWith({
+  expect(mocks.client.invalidateQueries).toHaveBeenCalledWith({
     queryKey: ["time-entries", "a"],
+  });
+  expect(mocks.client.invalidateQueries).toHaveBeenCalledWith({
+    queryKey: ["completed-reports", "p"],
+  });
+  expect(mocks.client.invalidateQueries).not.toHaveBeenCalledWith({
+    queryKey: ["tasks", "p"],
   });
   expect(mocks.getTask).not.toHaveBeenCalled();
 });

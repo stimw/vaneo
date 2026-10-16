@@ -1732,6 +1732,249 @@
           "updatedAt"
         ]
       },
+      "CompletedTaskReportSummary": {
+        "type": "object",
+        "properties": {
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "project": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "slug"
+            ]
+          },
+          "period": {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "to": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "timeZone": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "timeZone"
+            ]
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "taskCount": {
+                "type": "number"
+              },
+              "totalSeconds": {
+                "type": "number"
+              },
+              "zeroCount": {
+                "type": "number"
+              },
+              "unknownCompletionCount": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "taskCount",
+              "totalSeconds",
+              "zeroCount",
+              "unknownCompletionCount"
+            ]
+          },
+          "activity": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string"
+                },
+                "taskCount": {
+                  "type": "number"
+                },
+                "totalSeconds": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "date",
+                "taskCount",
+                "totalSeconds"
+              ]
+            }
+          },
+          "topTasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "ticketId": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "completedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "assigneeId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "assigneeName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "totalSeconds": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "ticketId",
+                "title",
+                "status",
+                "completedAt",
+                "assigneeId",
+                "assigneeName",
+                "totalSeconds"
+              ]
+            }
+          }
+        },
+        "required": [
+          "generatedAt",
+          "project",
+          "period",
+          "summary",
+          "activity",
+          "topTasks"
+        ]
+      },
+      "CompletedTaskReportPage": {
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "ticketId": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "completedAt": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "assigneeId": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "assigneeName": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "totalSeconds": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "ticketId",
+                "title",
+                "status",
+                "completedAt",
+                "assigneeId",
+                "assigneeName",
+                "totalSeconds"
+              ]
+            }
+          },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "taskCount": {
+                "type": "number"
+              },
+              "totalSeconds": {
+                "type": "number"
+              },
+              "zeroCount": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "taskCount",
+              "totalSeconds",
+              "zeroCount"
+            ]
+          },
+          "page": {
+            "type": "number"
+          },
+          "limit": {
+            "type": "number"
+          },
+          "nextPage": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "tasks",
+          "summary",
+          "page",
+          "limit",
+          "nextPage"
+        ]
+      },
       "TaskImportResult": {
         "type": "object",
         "properties": {
@@ -12274,6 +12517,50 @@
             "required": false,
             "name": "timeZone",
             "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Completion day in the supplied time zone."
+            },
+            "required": false,
+            "description": "Completion day in the supplied time zone.",
+            "name": "day",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ]
+            },
+            "required": false,
+            "name": "zeroOnly",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "completed",
+                "time"
+              ]
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
           }
         ],
         "responses": {
@@ -12289,6 +12576,293 @@
           },
           "400": {
             "description": "Invalid period or report too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No access to the project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/task/completed-report/{projectId}": {
+      "get": {
+        "operationId": "getCompletedReport",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get completed task time aggregates",
+        "description": "Period totals, daily activity in the supplied time zone, and three tasks with the most time. Uses current corrected task totals grouped by completion date. Includes completed archived tasks; reopened tasks are excluded. Does not load descriptions or time entries.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-01-31T09:00:00Z",
+              "description": "Inclusive completion timestamp."
+            },
+            "required": true,
+            "description": "Inclusive completion timestamp.",
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-01-31T09:00:00Z",
+              "description": "Exclusive completion timestamp."
+            },
+            "required": true,
+            "description": "Exclusive completion timestamp.",
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": "UTC"
+            },
+            "required": false,
+            "name": "timeZone",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completion report summary",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompletedTaskReportSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid period",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No access to the project",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/task/completed-report/{projectId}/tasks": {
+      "get": {
+        "operationId": "getCompletedReportPage",
+        "tags": [
+          "Tasks"
+        ],
+        "summary": "Get a page of completed report tasks",
+        "description": "Server-side search, completion-day and zero-hour filtering, ordered by completion or corrected time descending, then task number and ID. Summary totals cover all matching tasks, independent of pagination. Returns at most 100 lightweight tasks; descriptions and time entries are not loaded.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "projectId",
+            "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-01-31T09:00:00Z",
+              "description": "Inclusive completion timestamp."
+            },
+            "required": true,
+            "description": "Inclusive completion timestamp.",
+            "name": "from",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date-time",
+              "example": "2026-01-31T09:00:00Z",
+              "description": "Exclusive completion timestamp."
+            },
+            "required": true,
+            "description": "Exclusive completion timestamp.",
+            "name": "to",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 100,
+              "default": "UTC"
+            },
+            "required": false,
+            "name": "timeZone",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 200,
+              "default": ""
+            },
+            "required": false,
+            "name": "search",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "description": "Completion day in the supplied time zone."
+            },
+            "required": false,
+            "description": "Completion day in the supplied time zone.",
+            "name": "day",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "true",
+                "false"
+              ],
+              "default": "false"
+            },
+            "required": false,
+            "name": "zeroOnly",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": [
+                "completed",
+                "time"
+              ],
+              "default": "completed"
+            },
+            "required": false,
+            "name": "sort",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 1000000,
+              "default": 1
+            },
+            "required": false,
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 10
+            },
+            "required": false,
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Completion report task page",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompletedTaskReportPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid period or pagination",
             "content": {
               "application/json": {
                 "schema": {

@@ -264,6 +264,11 @@ input:-webkit-autofill:active {
   body {
     @apply bg-background font-sans text-foreground antialiased;
   }
+
+  :is(button, [role="button"]):not(:disabled):not([aria-disabled="true"]):not([data-disabled]) {
+    cursor: pointer;
+  }
+
   h1,
   h2,
   h3,
