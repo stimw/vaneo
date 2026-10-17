@@ -3,7 +3,7 @@ import { HttpError } from "@/lib/http-error";
 
 export async function updateTaskPlanning(
   taskId: string,
-  values: { estimatedSeconds?: number | null; progress?: number | null },
+  values: { progress: number | null },
 ) {
   const response = await client.task[":id"].planning.$patch({
     param: { id: taskId },

@@ -7,19 +7,16 @@ import { formatTrackedTime } from "./time-values";
 export function TaskEffort({
   progress,
   trackedSeconds = 0,
-  estimatedSeconds,
   completed = false,
   className,
 }: {
   progress?: number | null;
   trackedSeconds?: number;
-  estimatedSeconds?: number | null;
   completed?: boolean;
   className?: string;
 }) {
   const { t } = useTranslation();
   const percentage = completed ? 100 : progress;
-  const over = Boolean(estimatedSeconds && trackedSeconds > estimatedSeconds);
   return (
     <div
       className={cn(
@@ -40,28 +37,12 @@ export function TaskEffort({
             : t("tasks:planning.completion", { percent: percentage })}
         </TooltipPopup>
       </Tooltip>
-      {(trackedSeconds > 0 || Boolean(estimatedSeconds)) && (
+      {trackedSeconds > 0 && (
         <Tooltip>
-          <TooltipTrigger
-            render={
-              <span
-                className={cn(
-                  "truncate",
-                  over && "text-orange-600 dark:text-orange-400",
-                )}
-              />
-            }
-          >
+          <TooltipTrigger render={<span className="truncate" />}>
             {formatTrackedTime(trackedSeconds)}
-            {estimatedSeconds
-              ? ` / ${formatTrackedTime(estimatedSeconds)}`
-              : ""}
           </TooltipTrigger>
-          <TooltipPopup>
-            {over
-              ? t("tasks:planning.overEstimate")
-              : t("tasks:planning.budgetHint")}
-          </TooltipPopup>
+          <TooltipPopup>{t("tasks:time.label")}</TooltipPopup>
         </Tooltip>
       )}
     </div>

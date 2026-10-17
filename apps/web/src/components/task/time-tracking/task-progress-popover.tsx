@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
-import { Check, Timer } from "lucide-react";
-import { useState } from "react";
+import { Check } from "lucide-react";
+import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import CircularProgress from "@/components/ui/circular-progress";
@@ -11,41 +11,34 @@ import {
   InputGroupText,
 } from "@/components/ui/input-group";
 import { Popover, PopoverPopup, PopoverTrigger } from "@/components/ui/popover";
+import { Slider } from "@/components/ui/slider";
 import { updateTaskPlanning } from "@/fetchers/task/update-task-planning";
 import { useInvalidateTaskEffort } from "@/hooks/mutations/time-entry/use-invalidate-task-effort";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import type Task from "@/types/task";
 import { PropertyValue } from "../properties/property-value";
-import { formatTrackedTime, hoursToSeconds } from "./time-values";
 
-export function TaskPlanningPopover({
+export function TaskProgressPopover({
   task,
-  kind,
   completed,
   className,
 }: {
-  task: Task;
-  kind: "estimate" | "progress";
+  task: Pick<Task, "id" | "progress">;
   completed: boolean;
   className?: string;
 }) {
   const { t } = useTranslation();
+  const labelId = useId();
   const { canUpdateTimeEntries } = useWorkspacePermission();
   const invalidate = useInvalidateTaskEffort(task.id);
   const [open, setOpen] = useState(false);
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
-  const estimate = kind === "estimate";
   const percentage = completed ? 100 : task.progress;
-  const label = estimate
-    ? t("tasks:planning.estimate")
-    : t("tasks:planning.progress");
+  const label = t("tasks:planning.progress");
   const save = useMutation({
     mutationFn: (amount: number | null) =>
-      updateTaskPlanning(
-        task.id,
-        estimate ? { estimatedSeconds: amount } : { progress: amount },
-      ),
+      updateTaskPlanning(task.id, { progress: amount }),
     onSuccess: invalidate,
   });
   return (
@@ -54,53 +47,30 @@ export function TaskPlanningPopover({
       onOpenChange={(next) => {
         setOpen(next);
         setError("");
-        if (next)
-          setValue(
-            estimate
-              ? task.estimatedSeconds
-                ? String(Number((task.estimatedSeconds / 3600).toFixed(4)))
-                : ""
-              : task.progress == null
-                ? ""
-                : String(task.progress),
-          );
+        if (next) setValue(task.progress == null ? "" : String(task.progress));
       }}
     >
       <PopoverTrigger
-        disabled={!canUpdateTimeEntries() || (!estimate && completed)}
+        disabled={!canUpdateTimeEntries() || completed}
         render={<PropertyValue className={className} aria-label={label} />}
       >
-        {estimate ? (
-          <Timer className="text-muted-foreground" />
-        ) : (
-          <CircularProgress completed={percentage ?? 0} total={100} size={14} />
-        )}
+        <CircularProgress completed={percentage ?? 0} total={100} size={14} />
         <span className="truncate tabular-nums">
-          {estimate
-            ? task.estimatedSeconds
-              ? formatTrackedTime(task.estimatedSeconds)
-              : t("tasks:planning.unset")
-            : percentage == null
-              ? t("tasks:planning.unset")
-              : `${percentage}%`}
+          {percentage == null ? t("tasks:planning.unset") : `${percentage}%`}
         </span>
       </PopoverTrigger>
-      <PopoverPopup align="start" className="w-64 p-3" aria-label={label}>
+      <PopoverPopup align="start" className="w-80 p-3" aria-label={label}>
         <form
           onSubmit={async (event) => {
             event.preventDefault();
             if (save.isPending) return;
-            const amount = !value.trim()
-              ? null
-              : estimate
-                ? hoursToSeconds(value)
-                : Number(value);
+            const amount = value.trim() ? Number(value) : null;
             if (
               value.trim() &&
               (amount === null ||
-                (estimate
-                  ? amount <= 0
-                  : !Number.isInteger(amount) || amount < 0 || amount > 100))
+                !Number.isInteger(amount) ||
+                amount < 0 ||
+                amount > 100)
             ) {
               setError(t("tasks:planning.invalid"));
               return;
@@ -114,23 +84,37 @@ export function TaskPlanningPopover({
             }
           }}
         >
-          <div className="flex items-center gap-1.5">
-            <InputGroup>
+          <label id={labelId} className="sr-only">
+            {label}
+          </label>
+          <div className="grid grid-cols-[minmax(0,1fr)_4rem_auto] items-center gap-2">
+            <Slider
+              min={0}
+              max={100}
+              step={1}
+              value={[Math.max(0, Math.min(100, Number(value) || 0))]}
+              onValueChange={(next) =>
+                setValue(String(typeof next === "number" ? next : next[0]))
+              }
+              aria-labelledby={labelId}
+              disabled={save.isPending}
+            />
+            <InputGroup className="[&_input]:px-2 [&_input]:tabular-nums [&_input]:[appearance:textfield] [&_input::-webkit-inner-spin-button]:appearance-none [&_input::-webkit-outer-spin-button]:appearance-none">
               <InputGroupInput
                 type="number"
-                min={estimate ? 0.01 : 0}
-                max={estimate ? undefined : 100}
-                step={estimate ? "any" : 1}
+                min={0}
+                max={100}
+                step={1}
                 autoFocus
                 value={value}
-                placeholder={t("tasks:planning.unset")}
+                placeholder="0"
                 aria-label={label}
                 aria-invalid={Boolean(error)}
                 disabled={save.isPending}
                 onChange={(event) => setValue(event.target.value)}
               />
               <InputGroupAddon align="inline-end">
-                <InputGroupText>{estimate ? "h" : "%"}</InputGroupText>
+                <InputGroupText>%</InputGroupText>
               </InputGroupAddon>
             </InputGroup>
             <Button
@@ -143,11 +127,6 @@ export function TaskPlanningPopover({
               <Check />
             </Button>
           </div>
-          <p className="mt-2 text-[11px] text-muted-foreground">
-            {estimate
-              ? t("tasks:planning.estimateHint")
-              : t("tasks:planning.progressHint")}
-          </p>
           {error && (
             <p
               role="alert"

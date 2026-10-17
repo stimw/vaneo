@@ -3380,7 +3380,7 @@
 			"estimate": "Estimate",
 			"progress": "Progress",
 			"unset": "Not set",
-			"invalid": "Enter positive hours, or a whole percentage from 0 to 100. Leave blank to clear.",
+			"invalid": "Enter a whole percentage from 0 to 100. Leave blank to clear.",
 			"estimateHint": "Total hours expected for this task. Leave blank to clear.",
 			"progressHint": "Actual completion, independent of hours used. Leave blank to clear.",
 			"progressUnset": "Completion progress has not been set.",
@@ -3391,7 +3391,7 @@
 		},
 		"worklog": {
 			"date": "Work date",
-			"invalid": "Enter a date and hours greater than 0 and up to 24.",
+			"invalid": "Enter a date and 0.25–24 hours in 15-minute (0.25h) increments.",
 			"save": "Save time",
 			"log": "Log time",
 			"delete": "Delete time log",

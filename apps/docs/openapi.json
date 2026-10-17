@@ -16076,7 +16076,7 @@
           "Time Entries"
         ],
         "summary": "Log hours on a work date",
-        "description": "Add 1 second to 24 hours to a date without inventing a start or end time. The task's cumulative time increases by the logged duration.",
+        "description": "Add 15 minutes to 24 hours in 15-minute increments to a date without inventing a start or end time. Duration is in seconds. The task's cumulative time increases by the logged duration.",
         "parameters": [
           {
             "schema": {
@@ -16100,8 +16100,9 @@
                   },
                   "duration": {
                     "type": "integer",
-                    "minimum": 1,
-                    "maximum": 86400
+                    "minimum": 900,
+                    "maximum": 86400,
+                    "multipleOf": 900
                   }
                 },
                 "required": [
@@ -16213,6 +16214,7 @@
           "Time Entries"
         ],
         "summary": "Correct a dated time log",
+        "description": "Set 15 minutes to 24 hours in 15-minute increments. Duration is in seconds. Existing historical logs remain readable without rounding.",
         "parameters": [
           {
             "schema": {
@@ -16244,8 +16246,9 @@
                   },
                   "duration": {
                     "type": "integer",
-                    "minimum": 1,
-                    "maximum": 86400
+                    "minimum": 900,
+                    "maximum": 86400,
+                    "multipleOf": 900
                   }
                 },
                 "required": [

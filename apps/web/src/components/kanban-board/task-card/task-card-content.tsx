@@ -246,7 +246,6 @@ function TaskCardContent({
             <TaskEffort
               progress={task.progress}
               trackedSeconds={task.trackedSeconds}
-              estimatedSeconds={task.estimatedSeconds}
               completed={taskIsCompleted}
               className="mt-2.5"
             />

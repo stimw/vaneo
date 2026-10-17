@@ -7,33 +7,19 @@ vi.mock("react-i18next", () => ({
 }));
 afterEach(cleanup);
 describe("task effort display", () => {
-  it("shows actual completion independently of the hours budget", () => {
-    render(
-      <TaskEffort
-        progress={45}
-        trackedSeconds={32 * 3600}
-        estimatedSeconds={80 * 3600}
-      />,
-    );
+  it("shows manual completion alongside time spent", () => {
+    render(<TaskEffort progress={45} trackedSeconds={32 * 3600} />);
     expect(screen.getByText("45%")).toBeTruthy();
-    expect(screen.getByText("32h / 80h")).toBeTruthy();
+    expect(screen.getByText("32h")).toBeTruthy();
     expect(screen.queryByText("40%")).toBeNull();
   });
-  it("marks an overrun without treating it as 100% completion", () => {
-    render(
-      <TaskEffort
-        progress={70}
-        trackedSeconds={28 * 3600}
-        estimatedSeconds={24 * 3600}
-      />,
-    );
+  it("does not change manual completion as logged hours increase", () => {
+    render(<TaskEffort progress={70} trackedSeconds={28 * 3600} />);
     expect(screen.getByText("70%")).toBeTruthy();
-    expect(screen.getByText("28h / 24h").className).toContain(
-      "text-orange-600",
-    );
+    expect(screen.getByText("28h")).toBeTruthy();
     expect(screen.queryByText("100%")).toBeNull();
   });
-  it("shows completed tasks as 100%, and keeps missing estimates/progress explicit", () => {
+  it("shows completed tasks as 100%, and keeps missing progress explicit", () => {
     const { rerender } = render(
       <TaskEffort progress={45} trackedSeconds={0} completed />,
     );

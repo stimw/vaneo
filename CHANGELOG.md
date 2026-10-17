@@ -1,5 +1,14 @@
 # Vaneo changelog
 
+## Unreleased
+
+- Set task completion with a 0–100% slider or a percentage input. Completed
+  tasks still show 100%, and clients retain read-only access to progress.
+- Remove estimated hours from task properties, card footers and Time logged
+  CSV exports. Existing stored estimates and API fields remain compatible.
+- Require dated time logs to use 15-minute increments, from 15 minutes to
+  24 hours per entry. Existing historical records remain readable unchanged.
+
 ## 0.2.1
 
 - Fix large WebP uploads from photos saved as PNG: compare quality 0.8 with

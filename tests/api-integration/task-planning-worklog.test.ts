@@ -193,6 +193,58 @@ describe("task planning and dated time", () => {
     });
   });
 
+  it("accepts quarter-hour logs and rejects smaller or off-step additions and corrections without changing totals", async () => {
+    const f = await fixture();
+    const created = await f.app.request(
+      f.logs,
+      json("POST", { workDate: "2026-10-05", duration: 900 }),
+    );
+    expect(created.status, await created.clone().text()).toBe(200);
+    const entry = await created.json();
+    for (const duration of [1, 899, 901, 1200, 86401]) {
+      for (const [method, path] of [
+        ["POST", f.logs],
+        ["PUT", `${f.logs}/${entry.id}`],
+      ]) {
+        const response = await f.app.request(
+          path,
+          json(method, { workDate: "2026-10-05", duration }),
+        );
+        expect(response.status).toBe(400);
+      }
+    }
+    expect(await (await f.app.request(f.logs)).json()).toMatchObject({
+      total: 1,
+      totalSeconds: 36900,
+      entries: [{ duration: 900 }],
+    });
+    const updated = await f.app.request(
+      `${f.logs}/${entry.id}`,
+      json("PUT", { workDate: "2026-10-06", duration: 2700 }),
+    );
+    expect(updated.status, await updated.clone().text()).toBe(200);
+    expect(await (await f.app.request(f.logs)).json()).toMatchObject({
+      total: 1,
+      totalSeconds: 38700,
+      entries: [{ workDate: "2026-10-06", duration: 2700 }],
+    });
+  });
+
+  it("keeps historical logs below 15 minutes visible and unchanged", async () => {
+    const f = await fixture();
+    await db.insert(schema.taskWorklogTable).values({
+      taskId: f.task.id,
+      workDate: "2026-10-01",
+      duration: 300,
+    });
+    expect(await (await f.app.request(f.logs)).json()).toMatchObject({
+      total: 1,
+      totalSeconds: 36300,
+      entries: [{ workDate: "2026-10-01", duration: 300 }],
+    });
+    expect((await (await f.report()).json()).summary.totalSeconds).toBe(300);
+  });
+
   it("rejects invalid date/duration and prevents modifying a log through another task", async () => {
     const f = await fixture();
     for (const values of [
@@ -224,7 +276,7 @@ describe("task planning and dated time", () => {
       (
         await f.app.request(
           path,
-          json("PUT", { workDate: "2026-10-01", duration: 1 }),
+          json("PUT", { workDate: "2026-10-01", duration: 900 }),
         )
       ).status,
     ).toBe(404);
@@ -367,6 +419,64 @@ describe("task planning and dated time", () => {
       totalSeconds: 39600,
       unallocatedSeconds: 36000,
     });
+  });
+
+  it("bills only the selected month's daily work, including corrections, for tasks spanning months", async () => {
+    const f = await fixture();
+    const entries = await db
+      .insert(schema.taskWorklogTable)
+      .values([
+        { taskId: f.task.id, workDate: "2026-09-30", duration: 28800 },
+        { taskId: f.task.id, workDate: "2026-10-01", duration: 28800 },
+        { taskId: f.task.id, workDate: "2026-10-31", duration: 14400 },
+        { taskId: f.task.id, workDate: "2026-11-01", duration: 18000 },
+      ])
+      .returning();
+    const month = {
+      from: "2026-09-30T16:00:00Z",
+      to: "2026-10-31T16:00:00Z",
+      timeZone: "Asia/Shanghai",
+    };
+    const report = await (await f.report(month)).json();
+    expect(report.summary).toMatchObject({ taskCount: 1, totalSeconds: 43200 });
+    expect(report.tasks[0]).toMatchObject({
+      totalSeconds: 43200,
+      trackedSeconds: 126000,
+      completedAt: null,
+    });
+    expect(report.activity).toEqual([
+      { date: "2026-10-01", taskCount: 1, totalSeconds: 28800 },
+      { date: "2026-10-31", taskCount: 1, totalSeconds: 14400 },
+    ]);
+    const lastDay = entries.find((entry) => entry.workDate === "2026-10-31")!;
+    const corrected = await f.app.request(
+      `${f.logs}/${lastDay.id}`,
+      json("PUT", { workDate: "2026-10-31", duration: 18000 }),
+    );
+    expect(corrected.status, await corrected.clone().text()).toBe(200);
+    const current = await (await f.report(month)).json();
+    const exported = await (await f.report(month, "work-export")).json();
+    expect(current.summary.totalSeconds).toBe(46800);
+    expect(exported.summary).toEqual(current.summary);
+    expect(exported.tasks).toEqual(current.tasks);
+    expect(
+      current.activity.reduce(
+        (seconds: number, day: { totalSeconds: number }) =>
+          seconds + day.totalSeconds,
+        0,
+      ),
+    ).toBe(46800);
+    await db
+      .update(schema.taskTable)
+      .set({
+        status: "done",
+        columnId: f.columns.done.id,
+        completedAt: new Date("2026-11-03T00:00:00Z"),
+      })
+      .where(eq(schema.taskTable.id, f.task.id));
+    expect((await (await f.report(month)).json()).summary.totalSeconds).toBe(
+      46800,
+    );
   });
 
   it("returns stable pages, full exports and literal searches without loading task descriptions", async () => {

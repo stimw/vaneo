@@ -56,8 +56,9 @@ export function WorklogForm({
         const duration = hoursToSeconds(hours);
         if (
           duration === null ||
-          duration <= 0 ||
+          duration < 900 ||
           duration > 86400 ||
+          !Number.isInteger(Number(hours) * 4) ||
           !workDate
         ) {
           setError(t("tasks:worklog.invalid"));
@@ -101,9 +102,10 @@ export function WorklogForm({
             <InputGroupInput
               id={`${id}-hours`}
               type="number"
-              min="0.0003"
+              min="0.25"
               max="24"
-              step="any"
+              step="0.25"
+              placeholder="0.25"
               required
               autoFocus
               value={hours}

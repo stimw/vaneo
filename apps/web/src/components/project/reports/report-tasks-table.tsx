@@ -255,7 +255,6 @@ export function ReportTasksTable({
                         <TaskEffort
                           progress={task.progress}
                           trackedSeconds={task.trackedSeconds}
-                          estimatedSeconds={task.estimatedSeconds}
                           className="justify-start gap-3"
                         />
                       )}

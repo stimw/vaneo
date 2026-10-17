@@ -20,7 +20,7 @@ import { LabelsValue } from "./labels-value";
 import { PropertyRow } from "./property-row";
 import { PropertyValue } from "./property-value";
 import { useTaskProperties } from "./use-task-properties";
-import { TaskPlanningPopover } from "../time-tracking/task-planning-popover";
+import { TaskProgressPopover } from "../time-tracking/task-progress-popover";
 import { TaskTimePopover } from "../time-tracking/task-time-popover";
 
 type PropertiesRailProps = {
@@ -147,23 +147,14 @@ export function PropertiesRail({
           </div>
         </PropertyRow>
 
-        <PropertyRow label={t("tasks:planning.estimate")}>
-          <TaskPlanningPopover
-            key={`${taskId}-estimate`}
-            task={task}
-            kind="estimate"
-            completed={status.isFinal}
-          />
-        </PropertyRow>
         <PropertyRow label={t("tasks:time.label")}>
           <TaskTimePopover key={taskId} taskId={taskId} />
         </PropertyRow>
 
         <PropertyRow label={t("tasks:planning.progress")}>
-          <TaskPlanningPopover
+          <TaskProgressPopover
             key={`${taskId}-progress`}
             task={task}
-            kind="progress"
             completed={status.isFinal}
           />
         </PropertyRow>

@@ -22,7 +22,6 @@ export function reportCsv(
           "Last logged",
           "Period hours",
           "Total hours",
-          "Estimated hours",
           "Progress (%)",
           "Status",
         ],
@@ -33,9 +32,6 @@ export function reportCsv(
           task.loggedAt ?? null,
           Number((task.totalSeconds / 3600).toFixed(4)),
           Number(((task.trackedSeconds ?? 0) / 3600).toFixed(4)),
-          task.estimatedSeconds == null
-            ? null
-            : Number((task.estimatedSeconds / 3600).toFixed(4)),
           task.progress ?? null,
           task.status,
         ]),
