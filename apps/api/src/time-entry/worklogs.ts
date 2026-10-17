@@ -21,7 +21,7 @@ const body = z.object({
     .number()
     .int()
     .min(900)
-    .max(86400)
+    .max(2_147_483_647)
     .multipleOf(900)
     .openapi({ multipleOf: 900 }),
 });
@@ -102,7 +102,7 @@ export const worklogs = apiRouter<BaseVariables & { workspaceId: string }>()
       tags: ["Time Entries"],
       summary: "Log hours on a work date",
       description:
-        "Add 15 minutes to 24 hours in 15-minute increments to a date without inventing a start or end time. Duration is in seconds. The task's cumulative time increases by the logged duration.",
+        "Add time in 15-minute increments, with a minimum of 15 minutes. Historical allocations may exceed 24 hours and are attributed entirely to the chosen work date. Duration is in seconds. The task's cumulative time increases by the logged duration.",
       middleware: [
         ...access(),
         requireWorkspacePermission({ timeEntry: ["create"] }),
@@ -135,7 +135,7 @@ export const worklogs = apiRouter<BaseVariables & { workspaceId: string }>()
       tags: ["Time Entries"],
       summary: "Correct a dated time log",
       description:
-        "Set 15 minutes to 24 hours in 15-minute increments. Duration is in seconds. Existing historical logs remain readable without rounding.",
+        "Set time in 15-minute increments, with a minimum of 15 minutes. Historical allocations may exceed 24 hours. Duration is in seconds. Existing historical logs remain readable without rounding.",
       middleware: [
         ...access(),
         requireWorkspacePermission({ timeEntry: ["update"] }),

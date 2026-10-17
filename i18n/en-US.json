@@ -3391,7 +3391,7 @@
 		},
 		"worklog": {
 			"date": "Work date",
-			"invalid": "Enter a date and 0.25–24 hours in 15-minute (0.25h) increments.",
+			"invalid": "Enter a date and at least 0.25 hours, in 15-minute (0.25h) increments.",
 			"save": "Save time",
 			"log": "Log time",
 			"delete": "Delete time log",

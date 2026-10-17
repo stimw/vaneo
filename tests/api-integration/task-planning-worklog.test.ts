@@ -201,7 +201,7 @@ describe("task planning and dated time", () => {
     );
     expect(created.status, await created.clone().text()).toBe(200);
     const entry = await created.json();
-    for (const duration of [1, 899, 901, 1200, 86401]) {
+    for (const duration of [1, 899, 901, 1200, 86401, 2_147_483_648]) {
       for (const [method, path] of [
         ["POST", f.logs],
         ["PUT", `${f.logs}/${entry.id}`],
@@ -243,6 +243,41 @@ describe("task planning and dated time", () => {
       entries: [{ workDate: "2026-10-01", duration: 300 }],
     });
     expect((await (await f.report()).json()).summary.totalSeconds).toBe(300);
+  });
+
+  it("records and corrects historical allocations over 24 hours on one date and reporting month", async () => {
+    const f = await fixture();
+    const created = await f.app.request(
+      f.logs,
+      json("POST", { workDate: "2026-09-30", duration: 100 * 3600 }),
+    );
+    expect(created.status, await created.clone().text()).toBe(200);
+    const entry = await created.json();
+    expect(await (await f.app.request(f.logs)).json()).toMatchObject({
+      totalSeconds: 110 * 3600,
+      entries: [{ duration: 100 * 3600, workDate: "2026-09-30" }],
+    });
+    const month = {
+      from: "2026-09-01T00:00:00Z",
+      to: "2026-10-01T00:00:00Z",
+    };
+    const historical = await (await f.report(month)).json();
+    expect(historical.summary.totalSeconds).toBe(100 * 3600);
+    expect(historical.activity).toEqual([
+      { date: "2026-09-30", taskCount: 1, totalSeconds: 100 * 3600 },
+    ]);
+    expect((await (await f.report()).json()).summary.totalSeconds).toBe(0);
+    const corrected = await f.app.request(
+      `${f.logs}/${entry.id}`,
+      json("PUT", { workDate: "2026-09-30", duration: 125.25 * 3600 }),
+    );
+    expect(corrected.status, await corrected.clone().text()).toBe(200);
+    const exported = await (await f.report(month, "work-export")).json();
+    expect(exported.summary.totalSeconds).toBe(125.25 * 3600);
+    expect(exported.tasks[0]).toMatchObject({
+      totalSeconds: 125.25 * 3600,
+      trackedSeconds: 135.25 * 3600,
+    });
   });
 
   it("rejects invalid date/duration and prevents modifying a log through another task", async () => {

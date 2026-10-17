@@ -484,6 +484,13 @@
       "when": 1792219003891,
       "tag": "0068_furry_firebird",
       "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1792233845333,
+      "tag": "0069_majestic_karnak",
+      "breakpoints": true
     }
   ]
 }

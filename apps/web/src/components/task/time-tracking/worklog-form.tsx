@@ -57,7 +57,6 @@ export function WorklogForm({
         if (
           duration === null ||
           duration < 900 ||
-          duration > 86400 ||
           !Number.isInteger(Number(hours) * 4) ||
           !workDate
         ) {
@@ -103,7 +102,6 @@ export function WorklogForm({
               id={`${id}-hours`}
               type="number"
               min="0.25"
-              max="24"
               step="0.25"
               placeholder="0.25"
               required

@@ -747,10 +747,7 @@ export const taskWorklogTable = pgTable(
       table.id,
     ),
     index("task_worklog_date_idx").on(table.workDate),
-    check(
-      "task_worklog_duration_range",
-      sql`${table.duration} BETWEEN 1 AND 86400`,
-    ),
+    check("task_worklog_duration_range", sql`${table.duration} >= 1`),
   ],
 );
 

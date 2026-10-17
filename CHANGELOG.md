@@ -6,8 +6,10 @@
   tasks still show 100%, and clients retain read-only access to progress.
 - Remove estimated hours from task properties, card footers and Time logged
   CSV exports. Existing stored estimates and API fields remain compatible.
-- Require dated time logs to use 15-minute increments, from 15 minutes to
-  24 hours per entry. Existing historical records remain readable unchanged.
+- Require dated time logs to use 15-minute increments, with a minimum of
+  15 minutes. Existing historical records remain readable unchanged.
+- Allow historical time allocations longer than 24 hours on one work date.
+  The full allocation counts in that date's reporting month.
 
 ## 0.2.1
 

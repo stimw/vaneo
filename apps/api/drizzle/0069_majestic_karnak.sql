@@ -1,0 +1,2 @@
+ALTER TABLE "task_worklog" DROP CONSTRAINT "task_worklog_duration_range";--> statement-breakpoint
+ALTER TABLE "task_worklog" ADD CONSTRAINT "task_worklog_duration_range" CHECK ("task_worklog"."duration" >= 1);
