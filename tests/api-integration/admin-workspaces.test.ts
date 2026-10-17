@@ -130,6 +130,7 @@ describe("instance admin workspace management", () => {
       );
 
     expect((await setRole("viewer")).status).toBe(200);
+    expect((await setRole("client")).status).toBe(200);
     expect((await setRole("reviewer")).status).toBe(200);
     expect(await roleOf(ctx.workspace.id, ctx.restricted.id)).toBe("reviewer");
     expect((await setRole("owner")).status).toBe(400);
@@ -138,6 +139,7 @@ describe("instance admin workspace management", () => {
     const roles = await request(`/admin/workspaces/${ctx.workspace.id}/roles`);
     expect(await roles.json()).toEqual([
       "viewer",
+      "client",
       "member",
       "admin",
       "reviewer",

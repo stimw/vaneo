@@ -1279,7 +1279,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Може да гледа и коментира задачи.",
 				"member": "Може да креира и управува со задачи и проекти.",
-				"admin": "Има целосен пристап до работниот простор."
+				"admin": "Има целосен пристап до работниот простор.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Проекти",
@@ -3575,7 +3576,8 @@
 			"owner": "Сопственик",
 			"admin": "Администратор",
 			"member": "Член",
-			"viewer": "Прегледувач"
+			"viewer": "Прегледувач",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Членови",

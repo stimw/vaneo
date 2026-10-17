@@ -11,6 +11,7 @@ describe("getAssignableRoleOptions", () => {
   it("falls back to the built-in roles until the list loads", () => {
     expect(getAssignableRoleOptions(undefined)).toEqual([
       "viewer",
+      "client",
       "member",
       "admin",
     ]);
@@ -19,6 +20,7 @@ describe("getAssignableRoleOptions", () => {
   it("keeps a member's current role selectable when it is not listed", () => {
     expect(getAssignableRoleOptions(undefined, "Designer")).toEqual([
       "viewer",
+      "client",
       "member",
       "admin",
       "Designer",

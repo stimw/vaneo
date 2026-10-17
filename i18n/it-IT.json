@@ -896,7 +896,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Può visualizzare e commentare le attività.",
 				"member": "Può creare e gestire attività e progetti.",
-				"admin": "Ha accesso completo al workspace."
+				"admin": "Ha accesso completo al workspace.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Progetti",
@@ -3633,7 +3634,8 @@
 			"owner": "Proprietario",
 			"admin": "Amministratore",
 			"member": "Membro",
-			"viewer": "Visualizzatore"
+			"viewer": "Visualizzatore",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Membri",

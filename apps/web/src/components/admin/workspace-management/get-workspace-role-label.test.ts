@@ -6,6 +6,7 @@ const t = (key: string) => `t(${key})`;
 describe("getWorkspaceRoleLabel", () => {
   it("translates built-in roles", () => {
     expect(getWorkspaceRoleLabel("viewer", t)).toBe("t(team:roles.viewer)");
+    expect(getWorkspaceRoleLabel("client", t)).toBe("t(team:roles.client)");
     expect(getWorkspaceRoleLabel("owner", t)).toBe("t(team:roles.owner)");
   });
 

@@ -228,6 +228,8 @@ const RESERVED_ROLE_NAMES = [...DEFAULT_ROLE_NAMES, "owner"];
 
 const DEFAULT_ROLE_DESCRIPTIONS: Record<string, string> = {
   viewer: "Read-only access to projects, tasks, and workspace.",
+  client:
+    "Can create and edit tasks and view time, without managing projects or workspace settings.",
   member: "Can create and update projects and tasks.",
   admin: "Full project and task management plus workspace settings.",
 };
@@ -273,7 +275,7 @@ function RouteComponent() {
   const [roleToDelete, setRoleToDelete] = useState<WorkspaceRole | null>(null);
   const [openCustom, setOpenCustom] = useState<string[]>([]);
 
-  // Defaults (viewer/member/admin) first so they anchor the list, then
+  // Default roles first so they anchor the list, then
   // user-created roles in their natural order.
   const sortedRoles = useMemo(() => {
     const defaults: WorkspaceRole[] = [];

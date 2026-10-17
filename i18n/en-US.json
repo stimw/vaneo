@@ -1110,6 +1110,7 @@
 			"saveChanges": "Save changes",
 			"defaultRoleDescriptions": {
 				"viewer": "Can view and comment on tasks.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings.",
 				"member": "Can create and manage tasks and projects.",
 				"admin": "Has full access to the workspace."
 			},
@@ -3575,6 +3576,7 @@
 			"owner": "Owner",
 			"admin": "Admin",
 			"member": "Member",
+			"client": "Client",
 			"viewer": "Viewer"
 		},
 		"members": {

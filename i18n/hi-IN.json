@@ -888,7 +888,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "कार्य देख और टिप्पणी कर सकते हैं।",
 				"member": "कार्य और प्रोजेक्ट बना और प्रबंधित कर सकते हैं।",
-				"admin": "वर्कस्पेस तक पूर्ण पहुँच है।"
+				"admin": "वर्कस्पेस तक पूर्ण पहुँच है।",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "प्रोजेक्ट",
@@ -3575,7 +3576,8 @@
 			"owner": "मालिक",
 			"admin": "व्यवस्थापक",
 			"member": "सदस्य",
-			"viewer": "दर्शक"
+			"viewer": "दर्शक",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "सदस्य",

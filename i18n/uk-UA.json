@@ -1297,7 +1297,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Може переглядати та коментувати завдання.",
 				"member": "Може створювати завдання і проєкти та керувати ними.",
-				"admin": "Має повний доступ до робочого простору."
+				"admin": "Має повний доступ до робочого простору.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Проєкти",
@@ -3691,7 +3692,8 @@
 			"owner": "Власник",
 			"admin": "Адміністратор",
 			"member": "Учасник",
-			"viewer": "Спостерігач"
+			"viewer": "Спостерігач",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Учасники",

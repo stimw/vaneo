@@ -1287,7 +1287,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Peut voir et commenter les tâches.",
 				"member": "Peut créer et gérer les tâches et les projets.",
-				"admin": "A un accès complet à l'espace de travail."
+				"admin": "A un accès complet à l'espace de travail.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Projets",
@@ -3633,7 +3634,8 @@
 			"owner": "Propriétaire",
 			"admin": "Admin",
 			"member": "Membre",
-			"viewer": "Observateur"
+			"viewer": "Observateur",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Membres",

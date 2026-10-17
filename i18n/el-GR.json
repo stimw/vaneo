@@ -1279,7 +1279,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Μπορεί να βλέπει και να σχολιάζει εργασίες.",
 				"member": "Μπορεί να δημιουργεί και να διαχειρίζεται εργασίες και έργα.",
-				"admin": "Έχει πλήρη πρόσβαση στον χώρο εργασίας."
+				"admin": "Έχει πλήρη πρόσβαση στον χώρο εργασίας.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Έργα",
@@ -3575,7 +3576,8 @@
 			"owner": "Ιδιοκτήτης",
 			"admin": "Διαχειριστής",
 			"member": "Μέλος",
-			"viewer": "Θεατής"
+			"viewer": "Θεατής",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Μέλη",

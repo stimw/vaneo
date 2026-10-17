@@ -28,6 +28,16 @@ describe("roleAllows", () => {
     ).toBe(true);
   });
 
+  it("keeps an edited Client role narrower than its default permissions", () => {
+    expect(roleAllows("client", null, { task: ["create", "update"] })).toBe(
+      true,
+    );
+    expect(roleAllows("client", null, { timeEntry: ["create"] })).toBe(false);
+    const stored = JSON.stringify({ task: ["read"], workspace: ["read"] });
+    expect(roleAllows("client", stored, { task: ["read"] })).toBe(true);
+    expect(roleAllows("client", stored, { task: ["update"] })).toBe(false);
+  });
+
   it("falls back to the built-in statements when the stored JSON is malformed", () => {
     expect(roleAllows("viewer", "{not json", workspaceRead)).toBe(true);
     expect(roleAllows("custom", "{not json", workspaceRead)).toBe(false);

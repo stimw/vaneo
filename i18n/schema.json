@@ -4490,9 +4490,12 @@
 								},
 								"admin": {
 									"type": "string"
+								},
+								"client": {
+									"type": "string"
 								}
 							},
-							"required": ["viewer", "member", "admin"]
+							"required": ["viewer", "member", "admin", "client"]
 						},
 						"resources": {
 							"type": "object",
@@ -14463,9 +14466,12 @@
 						},
 						"viewer": {
 							"type": "string"
+						},
+						"client": {
+							"type": "string"
 						}
 					},
-					"required": ["owner", "admin", "member", "viewer"]
+					"required": ["owner", "admin", "member", "viewer", "client"]
 				},
 				"members": {
 					"type": "object",

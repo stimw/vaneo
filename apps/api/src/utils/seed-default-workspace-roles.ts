@@ -3,18 +3,19 @@ import { and, inArray, sql } from "drizzle-orm";
 import db, { schema } from "../database";
 
 /**
- * Backfill the editable default roles (viewer/member/admin) for every
+ * Backfill the editable default roles (viewer/client/member/admin) for every
  * workspace that's missing them. Runs on API startup after Drizzle
  * migrations.
  *
- * These three roles used to be static (compiled into better-auth's
+ * The original viewer/member/admin roles used to be static (compiled into better-auth's
  * `roles` config). They were converted to DB rows so admins can override
  * them per workspace, but that means existing workspaces, which were
  * created before the switch, have no rows yet. Without this backfill,
  * better-auth's dynamic-access-control resolution would treat them as
  * having an empty permission set on existing workspaces.
  *
- * Idempotent: only inserts rows that aren't already present.
+ * Also adds Client to workspaces created before it became a default.
+ * Idempotent: only inserts missing rows and preserves edited permissions.
  */
 export async function seedDefaultWorkspaceRoles() {
   try {

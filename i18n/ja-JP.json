@@ -879,7 +879,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "タスクの閲覧とコメントができます。",
 				"member": "タスクとプロジェクトの作成・管理ができます。",
-				"admin": "ワークスペースへのフルアクセス権を持ちます。"
+				"admin": "ワークスペースへのフルアクセス権を持ちます。",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "プロジェクト",
@@ -3517,7 +3518,8 @@
 			"owner": "オーナー",
 			"admin": "管理者",
 			"member": "メンバー",
-			"viewer": "閲覧者"
+			"viewer": "閲覧者",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "メンバー",

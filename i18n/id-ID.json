@@ -1270,7 +1270,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Akses hanya baca ke proyek, tugas, dan ruang kerja.",
 				"member": "Dapat membuat dan memperbarui proyek serta tugas.",
-				"admin": "Manajemen penuh proyek dan tugas serta pengaturan ruang kerja."
+				"admin": "Manajemen penuh proyek dan tugas serta pengaturan ruang kerja.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Proyek",
@@ -3517,7 +3518,8 @@
 			"owner": "Pemilik",
 			"admin": "Admin",
 			"member": "Anggota",
-			"viewer": "Lihat Saja"
+			"viewer": "Lihat Saja",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Anggota",

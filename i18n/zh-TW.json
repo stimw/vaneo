@@ -878,7 +878,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "可以檢視任務並留言。",
 				"member": "可以建立並管理任務與專案。",
-				"admin": "擁有工作區的完整存取權限。"
+				"admin": "擁有工作區的完整存取權限。",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "專案",
@@ -3517,7 +3518,8 @@
 			"owner": "擁有者",
 			"admin": "管理員",
 			"member": "成員",
-			"viewer": "檢視者"
+			"viewer": "檢視者",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "成員",

@@ -888,7 +888,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Tapşırıqlara baxa və şərh yaza bilər.",
 				"member": "Tapşırıqlar və layihələr yarada, onları idarə edə bilər.",
-				"admin": "İş sahəsinə tam giriş hüququ var."
+				"admin": "İş sahəsinə tam giriş hüququ var.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Layihələr",
@@ -3575,7 +3576,8 @@
 			"owner": "Sahib",
 			"admin": "İnzibatçı",
 			"member": "Üzv",
-			"viewer": "Baxışçı"
+			"viewer": "Baxışçı",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Üzvlər",

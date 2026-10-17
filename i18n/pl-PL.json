@@ -991,7 +991,8 @@
 			"owner": "Właściciel",
 			"admin": "Administrator",
 			"member": "Członek",
-			"viewer": "Obserwator"
+			"viewer": "Obserwator",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Członkowie",
@@ -1996,7 +1997,8 @@
 			"defaultRoleDescriptions": {
 				"admin": "Ma pełny dostęp do obszaru roboczego.",
 				"member": "Może tworzyć zadania i projekty oraz nimi zarządzać.",
-				"viewer": "Może wyświetlać zadania i dodawać komentarze."
+				"viewer": "Może wyświetlać zadania i dodawać komentarze.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"defaultRoleHelp": "Rola domyślna: nazwa jest zarezerwowana i nie można usunąć tego wiersza.",
 			"deleteDialog": {

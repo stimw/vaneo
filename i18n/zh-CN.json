@@ -879,7 +879,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "可以查看任务并发表评论。",
 				"member": "可以创建并管理任务和项目。",
-				"admin": "拥有工作区的完全访问权限。"
+				"admin": "拥有工作区的完全访问权限。",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "项目",
@@ -3517,7 +3518,8 @@
 			"owner": "所有者",
 			"admin": "管理员",
 			"member": "成员",
-			"viewer": "访客"
+			"viewer": "访客",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "成员",

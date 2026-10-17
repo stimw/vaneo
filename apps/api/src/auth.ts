@@ -404,7 +404,7 @@ export const auth = betterAuth({
       // accepts our custom statement.
       ac: ac as unknown as AccessControl,
       // Only `owner` stays static so its permissions can never be edited away
-      // from the workspace creator. `viewer`, `member`, and `admin` are
+      // from the workspace creator. `viewer`, `client`, `member`, and `admin` are
       // seeded into `workspace_role` per workspace and resolved via
       // dynamic access control, so admins can fully override (replace) their
       // permissions per workspace. See `seedDefaultWorkspaceRoles` + the

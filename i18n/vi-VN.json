@@ -879,7 +879,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Có thể xem và bình luận công việc.",
 				"member": "Có thể tạo và quản lý công việc, dự án.",
-				"admin": "Có toàn quyền truy cập không gian làm việc."
+				"admin": "Có toàn quyền truy cập không gian làm việc.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Dự án",
@@ -3517,7 +3518,8 @@
 			"owner": "Chủ sở hữu",
 			"admin": "Quản trị viên",
 			"member": "Thành viên",
-			"viewer": "Người xem"
+			"viewer": "Người xem",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Thành viên",

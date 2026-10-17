@@ -3,6 +3,7 @@ import {
   ac,
   admin,
   builtInRoles,
+  client,
   DEFAULT_ROLE_NAMES,
   defaultRolePayloads,
   member,
@@ -49,6 +50,14 @@ describe("@kaneo/permissions statement surface", () => {
 });
 
 describe("built-in role privileges", () => {
+  it("lets clients collaborate on tasks without time writes or administration", () => {
+    expect(client.statements).toEqual({
+      project: ["read"],
+      task: ["create", "read", "update"],
+      label: ["read"],
+      workspace: ["read"],
+    });
+  });
   it("grants time writes to team roles and keeps viewers read-only", () => {
     for (const role of [member, admin, owner]) {
       expect(role.statements.timeEntry).toEqual(["create", "update"]);
@@ -92,14 +101,16 @@ describe("built-in role privileges", () => {
     );
   });
 
-  it("groups all four roles under builtInRoles by name", () => {
+  it("groups the default roles and owner under builtInRoles by name", () => {
     expect(Object.keys(builtInRoles).sort()).toEqual([
       "admin",
+      "client",
       "member",
       "owner",
       "viewer",
     ]);
     expect(builtInRoles.viewer).toBe(viewer);
+    expect(builtInRoles.client).toBe(client);
     expect(builtInRoles.member).toBe(member);
     expect(builtInRoles.admin).toBe(admin);
     expect(builtInRoles.owner).toBe(owner);
@@ -108,10 +119,11 @@ describe("built-in role privileges", () => {
 
 describe("default-role seed payloads", () => {
   it("names the seedable defaults but excludes owner (kept as static role)", () => {
-    expect(DEFAULT_ROLE_NAMES).toEqual(["viewer", "member", "admin"]);
+    expect(DEFAULT_ROLE_NAMES).toEqual(["viewer", "client", "member", "admin"]);
     expect(DEFAULT_ROLE_NAMES).not.toContain("owner");
     expect(Object.keys(defaultRolePayloads).sort()).toEqual([
       "admin",
+      "client",
       "member",
       "viewer",
     ]);

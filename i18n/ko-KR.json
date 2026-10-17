@@ -1270,7 +1270,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "작업을 보고 댓글을 달 수 있습니다.",
 				"member": "작업과 프로젝트를 만들고 관리할 수 있습니다.",
-				"admin": "워크스페이스에 대한 전체 권한을 가집니다."
+				"admin": "워크스페이스에 대한 전체 권한을 가집니다.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "프로젝트",
@@ -3517,7 +3518,8 @@
 			"owner": "소유자",
 			"admin": "관리자",
 			"member": "멤버",
-			"viewer": "뷰어"
+			"viewer": "뷰어",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "멤버",

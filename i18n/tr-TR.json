@@ -1279,7 +1279,8 @@
 			"defaultRoleDescriptions": {
 				"viewer": "Talepleri görüntüleyebilir ve yorum yapabilir.",
 				"member": "Talep ve proje oluşturabilir ve yönetebilir.",
-				"admin": "Çalışma alanına tam erişimi vardır."
+				"admin": "Çalışma alanına tam erişimi vardır.",
+				"client": "Can create and edit tasks and view time, without managing projects or workspace settings."
 			},
 			"resources": {
 				"project": "Projeler",
@@ -3575,7 +3576,8 @@
 			"owner": "Sahip",
 			"admin": "Yönetici",
 			"member": "Üye",
-			"viewer": "Görüntüleyici"
+			"viewer": "Görüntüleyici",
+			"client": "Client"
 		},
 		"members": {
 			"pageTitle": "Üyeler",
