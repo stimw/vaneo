@@ -1,7 +1,17 @@
-import { afterEach, describe, expect, it, vi } from "vite-plus/test";
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from "vite-plus/test";
 import { createApp } from "../../apps/api/src/index";
 
+import { resetTestDatabase } from "./helpers/database";
+
 describe("API integration: config", () => {
+  beforeEach(() => resetTestDatabase());
   afterEach(() => vi.unstubAllEnvs());
 
   it.each(["true", "false", undefined])(

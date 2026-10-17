@@ -3,6 +3,7 @@ import { relations, sql } from "drizzle-orm";
 import {
   bigint,
   boolean,
+  check,
   customType,
   foreignKey,
   index,
@@ -27,6 +28,25 @@ const bytea = customType<{ data: Buffer; driverData: Buffer }>({
     return "bytea";
   },
 });
+
+export const instanceSettingsTable = pgTable(
+  "instance_settings",
+  {
+    id: text("id").primaryKey(),
+    maxUploadBytes: integer("max_upload_bytes").notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .default(utcNow)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    check("instance_settings_singleton", sql`${table.id} = 'uploads'`),
+    check(
+      "instance_settings_upload_limit",
+      sql`${table.maxUploadBytes} BETWEEN 1048576 AND 1073741824`,
+    ),
+  ],
+);
 
 export const userTable = pgTable("user", {
   id: text("id")

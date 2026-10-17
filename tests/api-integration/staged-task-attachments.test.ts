@@ -14,7 +14,8 @@ import {
 } from "./helpers/fixtures";
 const publish = vi.hoisted(() => vi.fn(async () => undefined));
 vi.mock("../../apps/api/src/events", () => ({ publishEvent: publish }));
-vi.mock("../../apps/api/src/storage/s3", () => ({
+vi.mock("../../apps/api/src/storage/s3", async (original) => ({
+  ...(await original<typeof import("../../apps/api/src/storage/s3")>()),
   validateTaskAssetUploadInput: vi.fn(),
   createTaskImageUploadUrl: vi.fn(async (context: { taskId: string }) => ({
     key: `${context.taskId}/test.png`,

@@ -2380,6 +2380,20 @@
 			"exportError": "Could not export the time report.",
 			"unknownDates": "{{count}} older tasks have unknown completion dates and were excluded.",
 			"export": "Export completed tasks & time"
+		},
+		"adminUploads": {
+			"title": "Uploads",
+			"subtitle": "Manage file upload limits for this instance.",
+			"maxFileSize": "Maximum file size",
+			"limitHint": "Applies to task attachments and project backgrounds in all workspaces. Images are checked after compression. Changes take effect immediately; existing files are kept.",
+			"proxyHint": "Your hosting provider or reverse proxy may impose a lower upload limit.",
+			"invalidLimit": "Enter a whole number from 1 to 1024 MiB.",
+			"save": "Save changes",
+			"loading": "Loading upload settings…",
+			"retry": "Retry",
+			"loadError": "Unable to load upload settings.",
+			"saved": "Upload limit updated.",
+			"saveError": "Unable to update the upload limit."
 		}
 	},
 	"navigation": {

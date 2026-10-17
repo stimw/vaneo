@@ -25,8 +25,10 @@ function useUploadProjectBackground() {
         icon: ImageUpIcon,
       });
     },
-    onError: () => {
-      toast.error(t("settings:projectGeneral.backgroundUploadError"));
+    onError: (error) => {
+      toast.error(
+        error.message || t("settings:projectGeneral.backgroundUploadError"),
+      );
     },
   });
 }

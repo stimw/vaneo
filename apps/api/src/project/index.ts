@@ -1,3 +1,4 @@
+import { getMaxUploadBytes } from "../config/upload-settings";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import { requireWorkspaceEntitlement } from "../billing/controllers/require-entitlement";
@@ -563,8 +564,9 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     const { id } = c.req.valid("param");
     const { contentType, size } = c.req.valid("json");
 
+    const maxUploadBytes = await getMaxUploadBytes();
     try {
-      validateProjectBackgroundUploadInput(contentType, size);
+      validateProjectBackgroundUploadInput(contentType, size, maxUploadBytes);
     } catch (error) {
       throw new HTTPException(400, {
         message:
@@ -588,12 +590,15 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     }
 
     try {
-      const upload = await createProjectBackgroundUploadUrl({
-        workspaceId: projectContext.workspaceId,
-        projectId: projectContext.projectId,
-        contentType,
-        size,
-      });
+      const upload = await createProjectBackgroundUploadUrl(
+        {
+          workspaceId: projectContext.workspaceId,
+          projectId: projectContext.projectId,
+          contentType,
+          size,
+        },
+        maxUploadBytes,
+      );
       return c.json(upload, 200);
     } catch (error) {
       throw new HTTPException(503, {
@@ -608,8 +613,9 @@ const project = apiRouter<BaseVariables & { workspaceId: string }>()
     const { id } = c.req.valid("param");
     const { key, contentType, size, version } = c.req.valid("json");
 
+    const maxUploadBytes = await getMaxUploadBytes();
     try {
-      validateProjectBackgroundUploadInput(contentType, size);
+      validateProjectBackgroundUploadInput(contentType, size, maxUploadBytes);
     } catch (error) {
       throw new HTTPException(400, {
         message:

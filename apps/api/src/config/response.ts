@@ -13,6 +13,10 @@ export const configSchema = z
       description:
         "Whether S3-compatible storage is configured, so task images and board backgrounds can be uploaded.",
     }),
+    maxUploadBytes: z.number().int().positive().openapi({
+      description:
+        "Effective per-file limit in bytes for task images, attachments and project backgrounds. Images are checked after browser compression. Existing attachments and user avatars are unaffected.",
+    }),
     hasGithubSignIn: z.boolean(),
     hasGoogleSignIn: z.boolean(),
     hasDiscordSignIn: z.boolean(),

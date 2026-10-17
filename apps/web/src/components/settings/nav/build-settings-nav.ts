@@ -11,6 +11,7 @@ import {
   SlidersHorizontal,
   Tag,
   User,
+  Upload,
 } from "lucide-react";
 import projectIcons from "@/constants/project-icons";
 import type {
@@ -164,6 +165,12 @@ export function buildSettingsNav({
               label: t("settings:adminWorkspaces.title"),
               to: "/dashboard/settings/admin/workspaces",
               icon: Building2,
+            },
+            {
+              id: "admin-uploads",
+              label: t("settings:adminUploads.title"),
+              to: "/dashboard/settings/admin/uploads",
+              icon: Upload,
             },
           ],
         }

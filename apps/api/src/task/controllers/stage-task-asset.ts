@@ -1,3 +1,4 @@
+import { getMaxUploadBytes } from "../../config/upload-settings";
 import { and, eq, inArray, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import db from "../../database";
@@ -23,9 +24,9 @@ async function uploadContext(projectId: string, userId: string) {
     surface: "description" as const,
   };
 }
-function validate(input: Upload) {
+function validate(input: Upload, maxUploadBytes: number) {
   try {
-    validateTaskAssetUploadInput(input.contentType, input.size);
+    validateTaskAssetUploadInput(input.contentType, input.size, maxUploadBytes);
   } catch (error) {
     throw new HTTPException(400, {
       message: error instanceof Error ? error.message : "Invalid upload",
@@ -37,11 +38,15 @@ export async function stageTaskAssetUpload(
   userId: string,
   input: Upload,
 ) {
-  validate(input);
+  const maxUploadBytes = await getMaxUploadBytes();
+  validate(input, maxUploadBytes);
   const context = await uploadContext(projectId, userId);
   let upload: Awaited<ReturnType<typeof createTaskImageUploadUrl>>;
   try {
-    upload = await createTaskImageUploadUrl({ ...context, ...input });
+    upload = await createTaskImageUploadUrl(
+      { ...context, ...input },
+      maxUploadBytes,
+    );
   } catch {
     throw new HTTPException(503, {
       message: "Image uploads are not configured",
@@ -75,7 +80,8 @@ export async function finalizeStagedTaskAsset(
   userId: string,
   input: Upload & { key: string },
 ) {
-  validate(input);
+  const maxUploadBytes = await getMaxUploadBytes();
+  validate(input, maxUploadBytes);
   await uploadContext(projectId, userId);
   const key = input.key.trim();
   // The persisted key is the issuance record. Project moves update authorization
@@ -95,7 +101,7 @@ export async function finalizeStagedTaskAsset(
     });
   let uploaded: Awaited<ReturnType<typeof verifyTaskAssetUpload>>;
   try {
-    uploaded = await verifyTaskAssetUpload(key, input);
+    uploaded = await verifyTaskAssetUpload(key, input, maxUploadBytes);
   } catch (error) {
     throw new HTTPException(
       error instanceof InvalidUploadedAssetError ? 400 : 503,

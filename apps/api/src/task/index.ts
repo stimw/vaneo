@@ -1,3 +1,4 @@
+import { getMaxUploadBytes } from "../config/upload-settings";
 import { withVerifiedStorageObject } from "../storage/cleanup-queue";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
@@ -1190,8 +1191,9 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     const { id } = c.req.valid("param");
     const { filename, contentType, size, surface } = c.req.valid("json");
 
+    const maxUploadBytes = await getMaxUploadBytes();
     try {
-      validateTaskAssetUploadInput(contentType, size);
+      validateTaskAssetUploadInput(contentType, size, maxUploadBytes);
     } catch (error) {
       throw new HTTPException(400, {
         message:
@@ -1221,15 +1223,18 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     }
 
     try {
-      const upload = await createTaskImageUploadUrl({
-        workspaceId: taskContext.workspaceId,
-        projectId: taskContext.projectId,
-        taskId: taskContext.taskId,
-        surface,
-        filename,
-        contentType,
-        size,
-      });
+      const upload = await createTaskImageUploadUrl(
+        {
+          workspaceId: taskContext.workspaceId,
+          projectId: taskContext.projectId,
+          taskId: taskContext.taskId,
+          surface,
+          filename,
+          contentType,
+          size,
+        },
+        maxUploadBytes,
+      );
 
       return c.json(upload, 200);
     } catch (error) {
@@ -1246,8 +1251,9 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
     const { key, filename, contentType, size, surface } = c.req.valid("json");
     const userId = c.get("userId");
 
+    const maxUploadBytes = await getMaxUploadBytes();
     try {
-      validateTaskAssetUploadInput(contentType, size);
+      validateTaskAssetUploadInput(contentType, size, maxUploadBytes);
     } catch (error) {
       throw new HTTPException(400, {
         message:
@@ -1294,10 +1300,14 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       normalizedKey,
       async () => {
         try {
-          return await verifyTaskAssetUpload(normalizedKey, {
-            size,
-            contentType,
-          });
+          return await verifyTaskAssetUpload(
+            normalizedKey,
+            {
+              size,
+              contentType,
+            },
+            maxUploadBytes,
+          );
         } catch (error) {
           throw new HTTPException(
             error instanceof InvalidUploadedAssetError ? 400 : 503,

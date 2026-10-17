@@ -5,6 +5,7 @@ function useGetConfig() {
   return useQuery({
     queryKey: ["config"],
     queryFn: getConfig,
+    refetchOnWindowFocus: true,
   });
 }
 

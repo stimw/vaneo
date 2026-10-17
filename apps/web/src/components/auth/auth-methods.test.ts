@@ -19,6 +19,7 @@ function config(overrides: Partial<GetConfigResponse> = {}) {
     isDemoMode: false,
     hasSmtp: true,
     hasImageUploads: false,
+    maxUploadBytes: 10485760,
     hasGithubSignIn: false,
     hasGoogleSignIn: false,
     hasDiscordSignIn: false,

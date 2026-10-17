@@ -45,7 +45,13 @@ On AWS you can [use an IAM role](/core/installation/storage-backends#aws-s3) ins
 
 ## Limits and browser access
 
-The default upload limit is 10 MiB. Change `S3_MAX_IMAGE_UPLOAD_BYTES` to set another limit in bytes; despite its name, it also covers non-image attachments. Signed upload URLs expire after 300 seconds by default, controlled by `S3_PRESIGN_TTL_SECONDS`.
+The default upload limit is 10 MiB per file. An instance administrator can change it in **Settings → Administration → Uploads**, from 1 to 1024 MiB. The saved value applies to new uploads in every workspace immediately, survives restarts, and covers task images, other attachments, draft attachments, and project backgrounds. Images are checked after browser compression. Lowering the limit does not delete existing files; avatars retain their separate limit.
+
+Until an administrator saves a value, `S3_MAX_IMAGE_UPLOAD_BYTES` supplies the default in bytes. A saved setting overrides this environment variable. The effective limit is also returned as `maxUploadBytes` by `GET /api/config`.
+
+Reverse proxies, CDNs and storage providers can impose a smaller request limit. Raise their upload body limit as needed when increasing the application setting. A larger setting in Vaneo cannot override an upstream limit.
+
+Signed upload URLs expire after 300 seconds by default, controlled by `S3_PRESIGN_TTL_SECONDS`.
 
 Configure storage CORS to allow your exact Kaneo origin and `PUT` requests with `Content-Type`. Both the storage endpoint and Kaneo should use HTTPS for a public deployment.
 

@@ -69,7 +69,7 @@ describe("S3 helpers", () => {
     );
     expect(() =>
       validateProjectBackgroundUploadInput("image/webp", 1048577),
-    ).toThrow("Upload exceeds the maximum upload size of 1MB.");
+    ).toThrow("Upload exceeds the maximum upload size of 1 MiB.");
     expect(() =>
       validateProjectBackgroundUploadInput("image/webp", 1048576),
     ).not.toThrow();
@@ -332,7 +332,7 @@ describe("S3 helpers", () => {
     );
     expect(() =>
       validateTaskAssetUploadInput("image/png", 2 * 1024 * 1024),
-    ).toThrow("Upload exceeds the maximum upload size of 1MB.");
+    ).toThrow("Upload exceeds the maximum upload size of 1 MiB.");
     expect(() => validateTaskAssetUploadInput("image/png", 512)).not.toThrow();
   });
 

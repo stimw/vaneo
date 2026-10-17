@@ -572,6 +572,11 @@
             "type": "boolean",
             "description": "Whether S3-compatible storage is configured, so task images and board backgrounds can be uploaded."
           },
+          "maxUploadBytes": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "description": "Effective per-file limit in bytes for task images, attachments and project backgrounds. Images are checked after browser compression. Existing attachments and user avatars are unaffected."
+          },
           "hasGithubSignIn": {
             "type": "boolean"
           },
@@ -619,6 +624,7 @@
           "isDemoMode",
           "hasSmtp",
           "hasImageUploads",
+          "maxUploadBytes",
           "hasGithubSignIn",
           "hasGoogleSignIn",
           "hasDiscordSignIn",
@@ -24620,6 +24626,93 @@
           },
           "401": {
             "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/admin/upload-settings": {
+      "put": {
+        "operationId": "updateUploadSettings",
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Set the instance upload limit",
+        "description": "Persist a per-file upload limit for every workspace. Takes effect on new upload requests immediately and overrides S3_MAX_IMAGE_UPLOAD_BYTES. Existing attachments are unchanged. Requires an instance administrator session; API keys are rejected.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "maxUploadBytes": {
+                    "type": "integer",
+                    "minimum": 1048576,
+                    "maximum": 1073741824,
+                    "description": "Maximum size of one task attachment or project background in bytes, from 1 MiB to 1 GiB. Images are checked after browser compression. Reverse proxy and storage limits still apply."
+                  }
+                },
+                "required": [
+                  "maxUploadBytes"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Saved upload limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "maxUploadBytes": {
+                      "type": "integer",
+                      "minimum": 1048576,
+                      "maximum": 1073741824,
+                      "description": "Maximum size of one task attachment or project background in bytes, from 1 MiB to 1 GiB. Images are checked after browser compression. Reverse proxy and storage limits still apply."
+                    }
+                  },
+                  "required": [
+                    "maxUploadBytes"
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid upload limit",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "An instance administrator session is required",
             "content": {
               "application/json": {
                 "schema": {

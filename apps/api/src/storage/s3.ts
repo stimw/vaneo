@@ -49,7 +49,6 @@ type StorageConfig = {
   publicBaseUrl?: string;
   keyPrefix: string;
   forcePathStyle: boolean;
-  maxImageUploadBytes: number;
   presignTtlSeconds: number;
 };
 
@@ -169,10 +168,6 @@ function getStorageConfig(): StorageConfig {
     publicBaseUrl: env("S3_PUBLIC_BASE_URL") || undefined,
     keyPrefix: env("S3_KEY_PREFIX"),
     forcePathStyle: parseBoolean(process.env.S3_FORCE_PATH_STYLE, true),
-    maxImageUploadBytes: parsePositiveInt(
-      process.env.S3_MAX_IMAGE_UPLOAD_BYTES,
-      DEFAULT_MAX_IMAGE_UPLOAD_BYTES,
-    ),
     presignTtlSeconds: parsePositiveInt(
       process.env.S3_PRESIGN_TTL_SECONDS,
       DEFAULT_PRESIGN_TTL_SECONDS,
@@ -180,7 +175,7 @@ function getStorageConfig(): StorageConfig {
   };
 }
 
-function getMaxImageUploadBytes() {
+export function getDefaultMaxUploadBytes() {
   return parsePositiveInt(
     process.env.S3_MAX_IMAGE_UPLOAD_BYTES,
     DEFAULT_MAX_IMAGE_UPLOAD_BYTES,
@@ -315,9 +310,8 @@ export function applyKeyPrefix(prefix: string, key: string) {
 export function validateTaskAssetUploadInput(
   contentType: string,
   size: number,
+  maxUploadBytes = getDefaultMaxUploadBytes(),
 ) {
-  const maxImageUploadBytes = getMaxImageUploadBytes();
-
   if (!contentType.trim()) {
     throw new Error("A valid content type is required.");
   }
@@ -326,9 +320,9 @@ export function validateTaskAssetUploadInput(
     throw new Error("Upload size must be a positive safe integer.");
   }
 
-  if (size > maxImageUploadBytes) {
+  if (size > maxUploadBytes) {
     throw new Error(
-      `Upload exceeds the maximum upload size of ${Math.floor(maxImageUploadBytes / (1024 * 1024))}MB.`,
+      `Upload exceeds the maximum upload size of ${Number((maxUploadBytes / (1024 * 1024)).toFixed(2))} MiB.`,
     );
   }
 }
@@ -336,9 +330,8 @@ export function validateTaskAssetUploadInput(
 export function validateProjectBackgroundUploadInput(
   contentType: string,
   size: number,
+  maxUploadBytes = getDefaultMaxUploadBytes(),
 ) {
-  const maxImageUploadBytes = getMaxImageUploadBytes();
-
   if (!contentType.trim()) {
     throw new Error("A valid content type is required.");
   }
@@ -353,17 +346,22 @@ export function validateProjectBackgroundUploadInput(
     throw new Error("Upload size must be greater than zero.");
   }
 
-  if (size > maxImageUploadBytes) {
+  if (size > maxUploadBytes) {
     throw new Error(
-      `Upload exceeds the maximum upload size of ${Math.floor(maxImageUploadBytes / (1024 * 1024))}MB.`,
+      `Upload exceeds the maximum upload size of ${Number((maxUploadBytes / (1024 * 1024)).toFixed(2))} MiB.`,
     );
   }
 }
 
 export async function createTaskImageUploadUrl(
   context: TaskImageUploadContext & { size: number },
+  maxUploadBytes = getDefaultMaxUploadBytes(),
 ): Promise<TaskImageUploadUrl> {
-  validateTaskAssetUploadInput(context.contentType, context.size);
+  validateTaskAssetUploadInput(
+    context.contentType,
+    context.size,
+    maxUploadBytes,
+  );
   const config = getStorageConfig();
   const client = getClient(config);
   const rawKey = buildObjectKey(context);
@@ -394,8 +392,13 @@ export async function createTaskImageUploadUrl(
 
 export async function createProjectBackgroundUploadUrl(
   context: ProjectBackgroundUploadContext,
+  maxUploadBytes = getDefaultMaxUploadBytes(),
 ): Promise<ProjectBackgroundUploadUrl> {
-  validateProjectBackgroundUploadInput(context.contentType, context.size);
+  validateProjectBackgroundUploadInput(
+    context.contentType,
+    context.size,
+    maxUploadBytes,
+  );
   const config = getStorageConfig();
   const client = getClient(config);
   const { rawKey, version } = buildProjectBackgroundObjectKey(context);
@@ -429,6 +432,7 @@ export class InvalidUploadedAssetError extends Error {}
 export async function verifyTaskAssetUpload(
   key: string,
   expected: { size: number; contentType: string },
+  maxUploadBytes = getDefaultMaxUploadBytes(),
 ) {
   const config = getStorageConfig();
   const client = getClient(config);
@@ -449,7 +453,7 @@ export async function verifyTaskAssetUpload(
   }
 
   const size = object.ContentLength;
-  if (typeof size === "number" && size > config.maxImageUploadBytes) {
+  if (typeof size === "number" && size > maxUploadBytes) {
     // Also remove oversized objects made with a still-valid older upload URL.
     // Invalid client size claims never cause deletion of an in-limit object.
     try {

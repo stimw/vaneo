@@ -6,6 +6,7 @@ import {
 } from "../openapi";
 import { requireInstanceAdmin } from "../utils/require-instance-admin";
 import { requireUserSession } from "../utils/require-user-session";
+import { uploadSettings } from "./upload-settings";
 import addWorkspaceMember from "./controllers/add-workspace-member";
 import listUsers from "./controllers/list-users";
 import listWorkspaceMembers from "./controllers/list-workspace-members";
@@ -214,6 +215,7 @@ const transferWorkspaceOwnershipRoute = createRoute({
 });
 
 const admin = apiRouter()
+  .route("/", uploadSettings)
   .openapi(listUsersRoute, async (c) =>
     c.json(await listUsers(c.req.valid("query")), 200),
   )

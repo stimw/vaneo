@@ -3150,6 +3150,20 @@
 			"title": "Completed tasks & time",
 			"to": "Completed through",
 			"unknownDates": "{{count}} older tasks have unknown completion dates and were excluded."
+		},
+		"adminUploads": {
+			"invalidLimit": "Enter a whole number from 1 to 1024 MiB.",
+			"limitHint": "Applies to task attachments and project backgrounds in all workspaces. Images are checked after compression. Changes take effect immediately; existing files are kept.",
+			"loadError": "Unable to load upload settings.",
+			"loading": "Loading upload settings…",
+			"maxFileSize": "Maximum file size",
+			"proxyHint": "Your hosting provider or reverse proxy may impose a lower upload limit.",
+			"retry": "Retry",
+			"save": "Save changes",
+			"saved": "Upload limit updated.",
+			"saveError": "Unable to update the upload limit.",
+			"subtitle": "Manage file upload limits for this instance.",
+			"title": "Uploads"
 		}
 	},
 	"tasks": {
