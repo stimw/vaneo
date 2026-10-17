@@ -42,3 +42,21 @@ describe("customer completion reports", () => {
     expect(csv.split("\r\n")).toHaveLength(2);
   });
 });
+
+it("exports period time, lifetime time and estimate separately for ongoing work", () => {
+  const row: ReportTask = {
+    ...task("1", 2, 7200, "+unsafe"),
+    completedAt: null,
+    status: "in-progress",
+    loggedAt: "2026-10-02",
+    trackedSeconds: 36000,
+    estimatedSeconds: 72000,
+    progress: 45,
+  };
+  const csv = reportCsv([row], "logged");
+  expect(csv).toContain(
+    '"Period hours","Total hours","Estimated hours","Progress (%)"',
+  );
+  expect(csv).toContain('"2026-10-02","2","10","20","45","in-progress"');
+  expect(csv).toContain('"\'+unsafe"');
+});

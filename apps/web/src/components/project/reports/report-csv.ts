@@ -1,3 +1,4 @@
+import type { ReportBasis } from "@/fetchers/task/get-completed-report";
 import type { ReportTask } from "./report-values";
 
 function cell(value: string | number | null) {
@@ -6,7 +7,42 @@ function cell(value: string | number | null) {
   return `"${text.replaceAll('"', '""')}"`;
 }
 
-export function reportCsv(tasks: ReportTask[]) {
+export function reportCsv(
+  tasks: ReportTask[],
+  basis: ReportBasis = "completed",
+) {
+  if (basis === "logged")
+    return (
+      "\ufeff" +
+      [
+        [
+          "Task",
+          "Title",
+          "Assignee",
+          "Last logged",
+          "Period hours",
+          "Total hours",
+          "Estimated hours",
+          "Progress (%)",
+          "Status",
+        ],
+        ...tasks.map((task) => [
+          task.ticketId,
+          task.title,
+          task.assigneeName,
+          task.loggedAt ?? null,
+          Number((task.totalSeconds / 3600).toFixed(4)),
+          Number(((task.trackedSeconds ?? 0) / 3600).toFixed(4)),
+          task.estimatedSeconds == null
+            ? null
+            : Number((task.estimatedSeconds / 3600).toFixed(4)),
+          task.progress ?? null,
+          task.status,
+        ]),
+      ]
+        .map((row) => row.map(cell).join(","))
+        .join("\r\n")
+    );
   return (
     "\ufeff" +
     [

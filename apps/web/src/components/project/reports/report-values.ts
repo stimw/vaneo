@@ -3,9 +3,16 @@ import type { getCompletedReport } from "@/fetchers/task/get-completed-report";
 import type { getCompletedReportPage } from "@/fetchers/task/get-completed-report-page";
 
 export type ReportSummary = Awaited<ReturnType<typeof getCompletedReport>>;
-export type ReportTask = Awaited<
+type PageTask = Awaited<
   ReturnType<typeof getCompletedReportPage>
 >["tasks"][number];
+export type ReportTask = Omit<PageTask, "completedAt"> & {
+  completedAt: string | null;
+  loggedAt?: string;
+  trackedSeconds?: number;
+  estimatedSeconds?: number | null;
+  progress?: number | null;
+};
 export type ReportMeasure = "hours" | "tasks";
 export type ReportSort = "completed" | "time";
 

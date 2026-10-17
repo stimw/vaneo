@@ -178,9 +178,21 @@ it("reconciles the initial handshake after active pagination completes", async (
   });
 });
 
-it("refreshes task time and project reports without reloading the board", () => {
+it("refreshes task time, card totals and reports without reloading the whole board", async () => {
+  mocks.getTask.mockReset().mockResolvedValue({
+    id: "a",
+    projectId: "p",
+    status: "todo",
+    position: 0,
+    trackedSeconds: 7200,
+    estimatedSeconds: 36000,
+    progress: 25,
+  });
   renderHook(() => useProjectWebSocket("p"));
   Socket.current.message("TIME_ENTRY_UPDATED", { taskId: "a" });
+  await Promise.resolve();
+  await Promise.resolve();
+  await Promise.resolve();
   expect(mocks.client.invalidateQueries).toHaveBeenCalledWith({
     queryKey: ["time-entries", "a"],
   });
@@ -190,8 +202,16 @@ it("refreshes task time and project reports without reloading the board", () => 
   expect(mocks.client.invalidateQueries).not.toHaveBeenCalledWith({
     queryKey: ["tasks", "p"],
   });
-  expect(mocks.getTask).not.toHaveBeenCalled();
+  expect(mocks.getTask).toHaveBeenCalledExactlyOnceWith("a", "board");
+  expect(
+    (
+      mocks.board as {
+        columns: { tasks: { trackedSeconds: number; progress: number }[] }[];
+      }
+    ).columns[0].tasks[0],
+  ).toMatchObject({ trackedSeconds: 7200, progress: 25 });
 });
+
 it("preserves distinct task effects across pagination and a disconnect before replay", async () => {
   vi.useFakeTimers();
   try {

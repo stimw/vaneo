@@ -5,6 +5,7 @@ import {
   boolean,
   check,
   customType,
+  date,
   foreignKey,
   index,
   integer,
@@ -576,6 +577,8 @@ export const taskTable = pgTable(
     trackedSeconds: bigint("tracked_seconds", { mode: "number" })
       .default(0)
       .notNull(),
+    estimatedSeconds: bigint("estimated_seconds", { mode: "number" }),
+    progress: integer("progress"),
     createdAt: timestamp("created_at", { mode: "date" })
       .default(utcNow)
       .notNull(),
@@ -585,6 +588,8 @@ export const taskTable = pgTable(
       .notNull(),
   },
   (table) => [
+    check("task_estimate_positive", sql`${table.estimatedSeconds} > 0`),
+    check("task_progress_range", sql`${table.progress} BETWEEN 0 AND 100`),
     index("task_projectId_idx").on(table.projectId),
     index("task_project_scheduled_id_idx")
       .on(table.projectId, table.id)
@@ -707,6 +712,45 @@ export const timeEntryTable = pgTable(
   (table) => [
     index("time_entry_taskId_idx").on(table.taskId),
     index("time_entry_userId_idx").on(table.userId),
+  ],
+);
+
+export const taskWorklogTable = pgTable(
+  "task_worklog",
+  {
+    id: text("id")
+      .$defaultFn(() => createId())
+      .primaryKey(),
+    taskId: text("task_id")
+      .notNull()
+      .references(() => taskTable.id, {
+        onDelete: "cascade",
+        onUpdate: "cascade",
+      }),
+    userId: text("user_id").references(() => userTable.id, {
+      onDelete: "set null",
+    }),
+    workDate: date("work_date").notNull(),
+    duration: integer("duration").notNull(),
+    createdAt: timestamp("created_at", { mode: "date" })
+      .default(utcNow)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .default(utcNow)
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("task_worklog_task_date_idx").on(
+      table.taskId,
+      table.workDate,
+      table.id,
+    ),
+    index("task_worklog_date_idx").on(table.workDate),
+    check(
+      "task_worklog_duration_range",
+      sql`${table.duration} BETWEEN 1 AND 86400`,
+    ),
   ],
 );
 

@@ -19,6 +19,7 @@ import {
 import { completedReportPeriod } from "@/components/project/tasks-import-export/completed-report-period";
 import TaskDetailsSheet from "@/components/task/task-details-sheet";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTab } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getCompletedReport } from "@/fetchers/task/get-completed-report";
 import type { ReportFilters } from "@/fetchers/task/get-completed-report-page";
@@ -30,12 +31,14 @@ type ReportSearch = {
   to?: string;
   taskId?: string;
   day?: string;
+  basis?: "logged" | "completed";
 };
 
 export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/reports",
 )({
   validateSearch: (search: Record<string, unknown>): ReportSearch => ({
+    basis: search.basis === "completed" ? "completed" : "logged",
     from: typeof search.from === "string" ? search.from : undefined,
     to: typeof search.to === "string" ? search.to : undefined,
     taskId: typeof search.taskId === "string" ? search.taskId : undefined,
@@ -61,9 +64,11 @@ function ProjectReports() {
     : format(startOfMonth(today), "yyyy-MM-dd");
   const to = validSearch ? search.to! : format(today, "yyyy-MM-dd");
   const period = completedReportPeriod(from, to)!;
+  const basis = search.basis ?? "logged";
   const query = useQuery({
-    queryKey: ["completed-reports", projectId, "summary", period],
-    queryFn: ({ signal }) => getCompletedReport(projectId, period, signal),
+    queryKey: ["completed-reports", projectId, "summary", period, basis],
+    queryFn: ({ signal }) =>
+      getCompletedReport(projectId, period, signal, basis),
     staleTime: 15_000,
     refetchInterval: 30_000,
   });
@@ -76,10 +81,16 @@ function ProjectReports() {
   const filters: ReportFilters = {
     search: debouncedText,
     day: search.day,
-    zeroOnly: zeroOnly ? "true" : "false",
+    zeroOnly: basis === "completed" && zeroOnly ? "true" : "false",
     sort,
   };
-  const details = useCompletedReportTasks(projectId, period, filters, pageSize);
+  const details = useCompletedReportTasks(
+    projectId,
+    period,
+    filters,
+    pageSize,
+    basis,
+  );
   const waitingForSearch = debouncedText !== text.trim();
   const setSearch = (change: Partial<ReportSearch>) =>
     navigate({ to: ".", replace: true, search: { ...search, ...change } });
@@ -106,7 +117,25 @@ function ProjectReports() {
         </div>
       }
       toolbar={
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <Tabs
+            value={basis}
+            onValueChange={(value) => {
+              if (value === "logged" || value === "completed") {
+                setZeroOnly(false);
+                void setSearch({ basis: value, day: undefined });
+              }
+            }}
+          >
+            <TabsList className="h-8">
+              <TabsTab value="logged" className="text-xs">
+                {t("tasks:workReport.timeLogged")}
+              </TabsTab>
+              <TabsTab value="completed" className="text-xs">
+                {t("tasks:workReport.completed")}
+              </TabsTab>
+            </TabsList>
+          </Tabs>
           <ReportRangePicker
             from={from}
             to={to}
@@ -115,6 +144,7 @@ function ProjectReports() {
             }}
           />
           <ReportExportMenu
+            basis={basis}
             projectId={projectId}
             period={period}
             from={from}
@@ -165,9 +195,10 @@ function ProjectReports() {
         ) : (
           query.data && (
             <>
-              <ReportMetrics summary={query.data.summary} />
+              <ReportMetrics summary={query.data.summary} basis={basis} />
               <div className="grid lg:grid-cols-[minmax(0,1fr)_290px]">
                 <ReportActivityChart
+                  basis={basis}
                   activity={query.data.activity}
                   from={from}
                   to={to}
@@ -186,6 +217,7 @@ function ProjectReports() {
                 />
               </div>
               <ReportTasksTable
+                basis={basis}
                 tasks={details.current?.tasks ?? []}
                 totalCount={details.current?.summary.taskCount ?? 0}
                 totalSeconds={details.current?.summary.totalSeconds ?? 0}
@@ -218,7 +250,9 @@ function ProjectReports() {
               <div className="flex flex-col gap-1 px-5 py-3 text-[11px] text-muted-foreground sm:px-7">
                 <p>
                   {t("tasks:reports.timeZone", { zone: period.timeZone })} ·{" "}
-                  {t("tasks:reports.currentTotals")}
+                  {basis === "logged"
+                    ? t("tasks:workReport.periodHint")
+                    : t("tasks:reports.currentTotals")}
                 </p>
                 {Boolean(query.data?.summary.unknownCompletionCount) && (
                   <p>

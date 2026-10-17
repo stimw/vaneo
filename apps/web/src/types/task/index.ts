@@ -39,6 +39,9 @@ type Task = {
   assigneeImage?: string | null;
   projectId: string;
   columnId?: string | null;
+  trackedSeconds?: number;
+  estimatedSeconds?: number | null;
+  progress?: number | null;
   subtaskCounts?: { completed: number; total: number };
   labels?: TaskLabel[];
   externalLinks?: TaskExternalLink[];

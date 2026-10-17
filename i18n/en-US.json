@@ -3311,7 +3311,7 @@
 			"pageUrlCopied": "Copied page URL"
 		},
 		"time": {
-			"label": "Time",
+			"label": "Time spent",
 			"hours": "Hours",
 			"save": "Save time",
 			"loadError": "Could not load time",
@@ -3375,6 +3375,44 @@
 			"pageOf": "Page {{page}} of {{total}}",
 			"loadingTasks": "Loading tasks…",
 			"exportFailed": "Could not export this view. Try again or select a shorter period."
+		},
+		"planning": {
+			"estimate": "Estimate",
+			"progress": "Progress",
+			"unset": "Not set",
+			"invalid": "Enter positive hours, or a whole percentage from 0 to 100. Leave blank to clear.",
+			"estimateHint": "Total hours expected for this task. Leave blank to clear.",
+			"progressHint": "Actual completion, independent of hours used. Leave blank to clear.",
+			"progressUnset": "Completion progress has not been set.",
+			"completion": "{{percent}}% complete",
+			"overEstimate": "Time spent exceeds the estimate. The ring shows completion, not budget usage.",
+			"budgetHint": "Time spent / estimated hours. Completion is set separately.",
+			"save": "Save"
+		},
+		"worklog": {
+			"date": "Work date",
+			"invalid": "Enter a date and hours greater than 0 and up to 24.",
+			"save": "Save time",
+			"log": "Log time",
+			"delete": "Delete time log",
+			"confirmDelete": "Delete this log and subtract its hours from the task total?",
+			"edit": "Edit time for {{date}}",
+			"empty": "No dated time logs yet.",
+			"more": "Show earlier logs",
+			"undated": "Undated balance",
+			"adjust": "Adjust historical total",
+			"adjustHint": "Set the task’s cumulative total. This adjustment has no work date and is excluded from Time logged reports."
+		},
+		"workReport": {
+			"timeLogged": "Time logged",
+			"completed": "Completed",
+			"tasksWorked": "Tasks worked on",
+			"lastLogged": "Last logged",
+			"calculation": "Hours logged on dates within this period, including ongoing tasks. Undated historical balances and running timers are excluded.",
+			"periodHint": "Dated time only · Undated balances excluded",
+			"activity": "Work activity",
+			"groupedByDate": "Hours and tasks by work date",
+			"chartDescription": "Work logged each day. Select a bar to filter the task table."
 		}
 	},
 	"invitations": {

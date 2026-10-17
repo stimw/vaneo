@@ -113,3 +113,26 @@ describe("report table pagination", () => {
     client.clear();
   });
 });
+
+it("separates logged/completed caches and resets pagination when the report basis changes", async () => {
+  const { client, wrapper } = setup();
+  fetchPage.mockImplementation(async (_id, _period, _filters, page) =>
+    pageResult(page),
+  );
+  const { result, rerender, unmount } = renderHook(
+    ({ basis }: { basis: "logged" | "completed" }) =>
+      useCompletedReportTasks("project", period, filters, 10, basis),
+    { wrapper, initialProps: { basis: "completed" as "logged" | "completed" } },
+  );
+  await waitFor(() => expect(result.current.current?.page).toBe(1));
+  await act(async () => {
+    await result.current.goToPage(2);
+  });
+  expect(result.current.page).toBe(2);
+  rerender({ basis: "logged" });
+  await waitFor(() => expect(result.current.current?.page).toBe(1));
+  expect(fetchPage.mock.lastCall?.[6]).toBe("logged");
+  expect(result.current.page).toBe(1);
+  unmount();
+  client.clear();
+});

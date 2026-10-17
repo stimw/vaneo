@@ -7,6 +7,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
+import type { ReportBasis } from "@/fetchers/task/get-completed-report";
 import { cn } from "@/lib/cn";
 import {
   reportActivity,
@@ -16,6 +17,7 @@ import {
 
 export function ReportActivityChart({
   activity,
+  basis = "completed",
   from,
   to,
   measure,
@@ -23,6 +25,7 @@ export function ReportActivityChart({
   onDaySelect,
 }: {
   activity: ReportSummary["activity"];
+  basis?: ReportBasis;
   from: string;
   to: string;
   measure: ReportMeasure;
@@ -34,15 +37,23 @@ export function ReportActivityChart({
   return (
     <section
       className="min-w-0 px-5 pt-5 pb-3 sm:px-7"
-      aria-label={t("tasks:reports.completionActivity")}
+      aria-label={
+        basis === "logged"
+          ? t("tasks:workReport.activity")
+          : t("tasks:reports.completionActivity")
+      }
     >
       <div className="mb-1 flex items-start justify-between gap-3">
         <div>
           <h2 className="text-sm font-medium">
-            {t("tasks:reports.completionActivity")}
+            {basis === "logged"
+              ? t("tasks:workReport.activity")
+              : t("tasks:reports.completionActivity")}
           </h2>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            {t("tasks:reports.groupedByCompletionDate")}
+            {basis === "logged"
+              ? t("tasks:workReport.groupedByDate")
+              : t("tasks:reports.groupedByCompletionDate")}
           </p>
         </div>
         <div
@@ -72,7 +83,11 @@ export function ReportActivityChart({
           hours: { label: t("tasks:reports.hours"), color: "var(--chart-1)" },
           tasks: { label: t("tasks:reports.tasks"), color: "var(--chart-1)" },
         }}
-        aria-label={t("tasks:reports.chartDescription")}
+        aria-label={
+          basis === "logged"
+            ? t("tasks:workReport.chartDescription")
+            : t("tasks:reports.chartDescription")
+        }
       >
         <BarChart
           accessibilityLayer

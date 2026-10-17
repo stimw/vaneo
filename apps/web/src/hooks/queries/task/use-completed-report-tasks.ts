@@ -4,21 +4,33 @@ import {
   getCompletedReportPage,
   type ReportFilters,
 } from "@/fetchers/task/get-completed-report-page";
-import type { ReportPeriod } from "@/fetchers/task/get-completed-report";
+import type {
+  ReportBasis,
+  ReportPeriod,
+} from "@/fetchers/task/get-completed-report";
 
 export function useCompletedReportTasks(
   projectId: string,
   period: ReportPeriod,
   filters: ReportFilters,
   limit: number,
+  basis: ReportBasis = "completed",
 ) {
-  const scope = JSON.stringify([projectId, period, filters, limit]);
+  const scope = JSON.stringify([projectId, period, filters, limit, basis]);
   const [position, setPosition] = useState({ scope, page: 1 });
   // A changed filter/period starts at page one, including when revisiting cached results.
   if (position.scope !== scope) setPosition({ scope, page: 1 });
   const requestedPage = position.scope === scope ? position.page : 1;
   const query = useInfiniteQuery({
-    queryKey: ["completed-reports", projectId, "tasks", period, filters, limit],
+    queryKey: [
+      "completed-reports",
+      projectId,
+      "tasks",
+      period,
+      filters,
+      limit,
+      basis,
+    ],
     queryFn: ({ pageParam, signal }) =>
       getCompletedReportPage(
         projectId,
@@ -27,6 +39,7 @@ export function useCompletedReportTasks(
         pageParam,
         limit,
         signal,
+        basis,
       ),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,

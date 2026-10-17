@@ -2,6 +2,7 @@ import { format } from "date-fns";
 import { Calendar, CalendarClock, CalendarX, Trash2Icon } from "lucide-react";
 import { memo, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { TaskEffort } from "@/components/task/time-tracking/task-effort";
 import { TaskProgressBadges } from "@/components/task/task-progress-badges";
 import { TaskPullRequests } from "@/components/task/task-pull-requests";
 import {
@@ -242,6 +243,13 @@ function TaskCardContent({
 
               <TaskPullRequests externalLinks={task.externalLinks} />
             </div>
+            <TaskEffort
+              progress={task.progress}
+              trackedSeconds={task.trackedSeconds}
+              estimatedSeconds={task.estimatedSeconds}
+              completed={taskIsCompleted}
+              className="mt-2.5"
+            />
           </div>
         </ContextMenuTrigger>
 

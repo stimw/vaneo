@@ -19,6 +19,7 @@ import { AssigneeAvatar } from "./assignee-avatar";
 import { dueDateTextClass } from "./due-date-text-class";
 import { LabelsValue } from "./labels-value";
 import { useTaskProperties } from "./use-task-properties";
+import { TaskPlanningPopover } from "../time-tracking/task-planning-popover";
 import { TaskTimePopover } from "../time-tracking/task-time-popover";
 
 type PropertyChipsProps = {
@@ -142,6 +143,20 @@ export function PropertyChips({
         </TaskLabelsPopover>
       </div>
       <div className="flex flex-wrap items-center gap-1.5">
+        <TaskPlanningPopover
+          key={`${taskId}-estimate`}
+          task={task}
+          kind="estimate"
+          completed={status.isFinal}
+          className={cn(chip, "flex-none")}
+        />
+        <TaskPlanningPopover
+          key={`${taskId}-progress`}
+          task={task}
+          kind="progress"
+          completed={status.isFinal}
+          className={cn(chip, "flex-none")}
+        />
         <TaskTimePopover
           key={taskId}
           taskId={taskId}

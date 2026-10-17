@@ -6,6 +6,7 @@ import {
 } from "../openapi";
 import { requireWorkspacePermission } from "../utils/require-workspace-permission";
 import { workspaceAccess } from "../utils/workspace-access-middleware";
+import { worklogs } from "./worklogs";
 import createTimeEntry from "./controllers/create-time-entry";
 import getTimeEntriesByTaskId from "./controllers/get-time-entries";
 import getTimeEntry from "./controllers/get-time-entry";
@@ -161,6 +162,7 @@ const setTaskTimeRoute = createRoute({
 });
 
 const timeEntry = apiRouter()
+  .route("/", worklogs)
   .openapi(getTaskTimeRoute, async (c) =>
     c.json(await getTaskTime(c.req.valid("param").taskId), 200),
   )

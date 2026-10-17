@@ -5,13 +5,18 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Menu, MenuItem, MenuPopup, MenuTrigger } from "@/components/ui/menu";
 import { exportCompletedTasks } from "@/fetchers/task/export-completed-tasks";
-import type { ReportPeriod } from "@/fetchers/task/get-completed-report";
+import { exportWorkReport } from "@/fetchers/task/export-work-report";
+import type {
+  ReportBasis,
+  ReportPeriod,
+} from "@/fetchers/task/get-completed-report";
 import type { ReportFilters } from "@/fetchers/task/get-completed-report-page";
 import { toast } from "@/lib/toast";
 import { reportCsv } from "./report-csv";
 
 export function ReportExportMenu({
   projectId,
+  basis = "completed",
   period,
   from,
   to,
@@ -19,6 +24,7 @@ export function ReportExportMenu({
   filters,
 }: {
   projectId: string;
+  basis?: ReportBasis;
   period: ReportPeriod;
   from: string;
   to: string;
@@ -29,13 +35,15 @@ export function ReportExportMenu({
   const download = useMutation({
     mutationFn: async (format: "csv" | "json") => {
       // Export all matching rows only when requested, independently of loaded pages.
-      const report = await exportCompletedTasks(projectId, period, filters);
-      const filename = `${report.project.slug}-${from}-${to}`;
+      const report = await (basis === "logged"
+        ? exportWorkReport(projectId, period, filters)
+        : exportCompletedTasks(projectId, period, filters));
+      const filename = `${report.project.slug}-${basis}-${from}-${to}`;
       saveAs(
         new Blob(
           [
             format === "csv"
-              ? reportCsv(report.tasks)
+              ? reportCsv(report.tasks, basis)
               : JSON.stringify({ ...report, view: filters }, null, 2),
           ],
           {

@@ -2,12 +2,15 @@ import { useTranslation } from "react-i18next";
 import { Info } from "lucide-react";
 import { formatTrackedTime } from "@/components/task/time-tracking/time-values";
 import { Tooltip, TooltipPopup, TooltipTrigger } from "@/components/ui/tooltip";
+import type { ReportBasis } from "@/fetchers/task/get-completed-report";
 import type { ReportSummary } from "./report-values";
 
 export function ReportMetrics({
   summary,
+  basis = "completed",
 }: {
   summary: ReportSummary["summary"];
+  basis?: ReportBasis;
 }) {
   const { t } = useTranslation();
   const seconds = summary.totalSeconds;
@@ -18,7 +21,11 @@ export function ReportMetrics({
     >
       <div className="flex flex-col gap-1 px-5 py-5 sm:px-7">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <span>{t("tasks:reports.completedTaskTime")}</span>
+          <span>
+            {basis === "logged"
+              ? t("tasks:workReport.timeLogged")
+              : t("tasks:reports.completedTaskTime")}
+          </span>
           <Tooltip>
             <TooltipTrigger
               render={
@@ -32,7 +39,9 @@ export function ReportMetrics({
               <Info className="size-3.5" aria-hidden="true" />
             </TooltipTrigger>
             <TooltipPopup className="max-w-80">
-              {t("tasks:reports.calculationDetails")}
+              {basis === "logged"
+                ? t("tasks:workReport.calculation")
+                : t("tasks:reports.calculationDetails")}
             </TooltipPopup>
           </Tooltip>
         </div>
@@ -42,7 +51,9 @@ export function ReportMetrics({
       </div>
       <div className="flex flex-col gap-1 px-5 py-5 sm:px-7">
         <span className="text-xs text-muted-foreground">
-          {t("tasks:reports.completedTasks")}
+          {basis === "logged"
+            ? t("tasks:workReport.tasksWorked")
+            : t("tasks:reports.completedTasks")}
         </span>
         <span className="text-2xl font-medium tracking-tight tabular-nums sm:text-3xl">
           {summary.taskCount}

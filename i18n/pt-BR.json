@@ -3429,6 +3429,44 @@
 			"pageOf": "Page {{page}} of {{total}}",
 			"loadingTasks": "Loading tasks…",
 			"exportFailed": "Could not export this view. Try again or select a shorter period."
+		},
+		"planning": {
+			"budgetHint": "Time spent / estimated hours. Completion is set separately.",
+			"completion": "{{percent}}% complete",
+			"estimate": "Estimate",
+			"estimateHint": "Total hours expected for this task. Leave blank to clear.",
+			"invalid": "Enter positive hours, or a whole percentage from 0 to 100. Leave blank to clear.",
+			"overEstimate": "Time spent exceeds the estimate. The ring shows completion, not budget usage.",
+			"progress": "Progress",
+			"progressHint": "Actual completion, independent of hours used. Leave blank to clear.",
+			"progressUnset": "Completion progress has not been set.",
+			"unset": "Not set",
+			"save": "Save"
+		},
+		"worklog": {
+			"adjust": "Adjust historical total",
+			"adjustHint": "Set the task’s cumulative total. This adjustment has no work date and is excluded from Time logged reports.",
+			"confirmDelete": "Delete this log and subtract its hours from the task total?",
+			"date": "Work date",
+			"delete": "Delete time log",
+			"edit": "Edit time for {{date}}",
+			"empty": "No dated time logs yet.",
+			"invalid": "Enter a date and hours greater than 0 and up to 24.",
+			"log": "Log time",
+			"more": "Show earlier logs",
+			"save": "Save time",
+			"undated": "Undated balance"
+		},
+		"workReport": {
+			"calculation": "Hours logged on dates within this period, including ongoing tasks. Undated historical balances and running timers are excluded.",
+			"completed": "Completed",
+			"lastLogged": "Last logged",
+			"periodHint": "Dated time only · Undated balances excluded",
+			"tasksWorked": "Tasks worked on",
+			"timeLogged": "Time logged",
+			"activity": "Work activity",
+			"groupedByDate": "Hours and tasks by work date",
+			"chartDescription": "Work logged each day. Select a bar to filter the task table."
 		}
 	},
 	"invitations": {

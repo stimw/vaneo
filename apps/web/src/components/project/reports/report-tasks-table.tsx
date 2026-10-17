@@ -7,6 +7,8 @@ import {
   X,
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { TaskEffort } from "@/components/task/time-tracking/task-effort";
+import type { ReportBasis } from "@/fetchers/task/get-completed-report";
 import { formatTrackedTime } from "@/components/task/time-tracking/time-values";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,12 +25,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getStatusLabel } from "@/lib/i18n/domain";
 import { cn } from "@/lib/cn";
 import type { ReportSort, ReportTask } from "./report-values";
 import { ReportPagination } from "./report-pagination";
 
 export function ReportTasksTable({
   tasks,
+  basis = "completed",
   totalCount,
   totalSeconds,
   page,
@@ -52,6 +56,7 @@ export function ReportTasksTable({
   onTaskSelect,
 }: {
   tasks: ReportTask[];
+  basis?: ReportBasis;
   totalCount: number;
   totalSeconds: number;
   page: number;
@@ -84,7 +89,9 @@ export function ReportTasksTable({
       <div className="flex min-h-14 flex-wrap items-center justify-between gap-2 px-5 py-3 sm:px-7">
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="text-sm font-medium">
-            {t("tasks:reports.completedTasks")}
+            {basis === "logged"
+              ? t("tasks:workReport.tasksWorked")
+              : t("tasks:reports.completedTasks")}
           </h2>
           <span className="text-xs text-muted-foreground tabular-nums">
             {pending ? "—" : totalCount}
@@ -168,7 +175,9 @@ export function ReportTasksTable({
                 onClick={() => onSort("completed")}
                 className="flex items-center gap-1.5 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {t("tasks:reports.completed")}
+                {basis === "logged"
+                  ? t("tasks:workReport.lastLogged")
+                  : t("tasks:reports.completed")}
                 <ArrowDown
                   aria-hidden="true"
                   className={cn("size-3", sort !== "completed" && "opacity-0")}
@@ -184,7 +193,9 @@ export function ReportTasksTable({
                 onClick={() => onSort("time")}
                 className="ms-auto flex items-center gap-1.5 py-2 outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {t("tasks:reports.time")}
+                {basis === "logged"
+                  ? t("tasks:workReport.timeLogged")
+                  : t("tasks:reports.time")}
                 <ArrowDownWideNarrow
                   aria-hidden="true"
                   className={cn(
@@ -205,10 +216,12 @@ export function ReportTasksTable({
             >
               <TableCell className="ps-5 py-3 sm:ps-7">
                 <div className="flex min-w-0 items-center gap-3">
-                  <CircleCheck
-                    aria-hidden="true"
-                    className="size-4 shrink-0 text-muted-foreground/70"
-                  />
+                  {basis === "completed" && (
+                    <CircleCheck
+                      aria-hidden="true"
+                      className="size-4 shrink-0 text-muted-foreground/70"
+                    />
+                  )}
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <button
                       type="button"
@@ -221,13 +234,32 @@ export function ReportTasksTable({
                     >
                       {task.title}
                     </button>
-                    <span className="text-[11px] text-muted-foreground">
-                      {task.ticketId}
-                      <span className="sm:hidden">
-                        {" "}
-                        · {format(parseISO(task.completedAt), "MMM d")}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                      <span className="text-[11px] text-muted-foreground">
+                        {task.ticketId}
+                        {basis === "logged"
+                          ? ` · ${getStatusLabel(task.status)}`
+                          : ""}
+                        <span className="sm:hidden">
+                          {" "}
+                          ·{" "}
+                          {(task.loggedAt ?? task.completedAt)
+                            ? format(
+                                parseISO(task.loggedAt ?? task.completedAt!),
+                                "MMM d",
+                              )
+                            : "—"}
+                        </span>
                       </span>
-                    </span>
+                      {basis === "logged" && (
+                        <TaskEffort
+                          progress={task.progress}
+                          trackedSeconds={task.trackedSeconds}
+                          estimatedSeconds={task.estimatedSeconds}
+                          className="justify-start gap-3"
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
               </TableCell>
@@ -237,7 +269,12 @@ export function ReportTasksTable({
                 </span>
               </TableCell>
               <TableCell className="hidden text-xs text-muted-foreground sm:table-cell">
-                {format(parseISO(task.completedAt), "MMM d, yyyy")}
+                {(task.loggedAt ?? task.completedAt)
+                  ? format(
+                      parseISO(task.loggedAt ?? task.completedAt!),
+                      "MMM d, yyyy",
+                    )
+                  : "—"}
               </TableCell>
               <TableCell
                 className={cn(

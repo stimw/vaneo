@@ -32,6 +32,11 @@ export const taskSchema = z
       description:
         "Manually editable task time total in seconds, excluding running entries. Use the task time-total endpoints to read and set it.",
     }),
+    estimatedSeconds: z.number().nullable().optional(),
+    progress: z.number().int().min(0).max(100).nullable().optional().openapi({
+      description:
+        "Team-maintained completion percentage; null when not set. Time used is independent of completion progress.",
+    }),
     createdAt: responseTimestamp,
     customFields: z
       .array(z.object({ fieldId: z.string(), value: z.string() }))

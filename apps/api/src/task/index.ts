@@ -1,4 +1,6 @@
 import { getMaxUploadBytes } from "../config/upload-settings";
+import { taskPlanning } from "./planning";
+import { workReport } from "./work-report";
 import { withVerifiedStorageObject } from "../storage/cleanup-queue";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
@@ -865,6 +867,8 @@ const descriptionMatchesRoute = createRoute({
 });
 
 const task = apiRouter<BaseVariables & { workspaceId: string }>()
+  .route("/", taskPlanning)
+  .route("/", workReport)
   .openapi(descriptionPageRoute, async (c) =>
     c.json(
       await getDescriptionPage(c.req.valid("param").id, c.req.valid("query")),

@@ -4,9 +4,8 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverPopup, PopoverTrigger } from "@/components/ui/popover";
 import { useTaskTime } from "@/hooks/queries/time-entry/use-task-time";
-import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { PropertyValue } from "../properties/property-value";
-import { TimeTotalForm } from "./time-total-form";
+import { WorklogPanel } from "./worklog-panel";
 import { formatTrackedTime } from "./time-values";
 
 export function TaskTimePopover({
@@ -18,12 +17,11 @@ export function TaskTimePopover({
 }) {
   const { t } = useTranslation();
   const query = useTaskTime(taskId);
-  const { canUpdateTimeEntries } = useWorkspacePermission();
   const [open, setOpen] = useState(false);
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger
-        disabled={!canUpdateTimeEntries() || query.isPending}
+        disabled={query.isPending}
         render={
           <PropertyValue
             className={className}
@@ -42,7 +40,7 @@ export function TaskTimePopover({
       </PopoverTrigger>
       <PopoverPopup
         align="start"
-        className="w-52 p-2"
+        className="w-80 p-3"
         aria-label={t("tasks:time.label")}
       >
         {query.isError ? (
@@ -60,10 +58,9 @@ export function TaskTimePopover({
             </Button>
           </>
         ) : query.data ? (
-          <TimeTotalForm
+          <WorklogPanel
             taskId={taskId}
             totalSeconds={query.data.totalSeconds}
-            onSaved={() => setOpen(false)}
           />
         ) : null}
       </PopoverPopup>
