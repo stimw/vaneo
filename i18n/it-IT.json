@@ -3659,7 +3659,11 @@
 			"error": "Invito membro del team fallito",
 			"createdTitle": "Invito creato",
 			"shareLinkDescription": "Condividi questo link con {{email}} così potrà unirsi al workspace.",
-			"done": "Fatto"
+			"done": "Fatto",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Nessun membro del team ancora",

@@ -59,7 +59,7 @@ vi.mock(
 );
 
 vi.mock("@/hooks/queries/workspace/use-workspace-roles", () => ({
-  default: () => ({ data: [] }),
+  default: () => ({ data: [{ id: "client-role", role: "client" }] }),
 }));
 
 const updateProjectAccess = vi.fn();
@@ -232,6 +232,28 @@ describe("MembersTable project access", () => {
     makeMember("restricted-user", "member", "Riley Restricted"),
     makeMember("open-user", "member", "Avery All"),
   ];
+
+  it("offers Client once when changing a member's role", async () => {
+    render(
+      <MembersTable
+        workspaceId="workspace-1"
+        invitations={[]}
+        users={[members[3]]}
+      />,
+    );
+    fireEvent.click(
+      screen.getByRole("combobox", { name: "team:membersTable.columns.role" }),
+    );
+    expect(
+      await screen.findByRole("option", { name: "team:roles.client" }),
+    ).toBeVisible();
+    expect(
+      screen.getAllByRole("option", { name: "team:roles.client" }),
+    ).toHaveLength(1);
+    expect(
+      screen.queryByRole("option", { name: "team:roles.owner" }),
+    ).not.toBeInTheDocument();
+  });
 
   it("lets managers edit other members' access but not owners or themselves", () => {
     render(

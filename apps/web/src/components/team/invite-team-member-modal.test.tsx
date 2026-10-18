@@ -55,6 +55,22 @@ const myAccess = vi.fn(() => ({
   isError: false,
   data: { projectAccess: "all", projectIds: [] as string[] },
 }));
+const roleQuery = vi.fn(
+  (): {
+    data: string[] | undefined;
+    isPending: boolean;
+    isError: boolean;
+    refetch: ReturnType<typeof vi.fn>;
+  } => ({
+    data: ["viewer", "client", "member", "admin", "reviewer"],
+    isPending: false,
+    isError: false,
+    refetch: vi.fn(),
+  }),
+);
+vi.mock("@/hooks/queries/workspace/use-invitation-roles", () => ({
+  useInvitationRoles: () => roleQuery(),
+}));
 vi.mock("@/hooks/queries/workspace-users/use-get-my-project-access", () => ({
   default: () => myAccess(),
 }));
@@ -67,6 +83,12 @@ function wrapper({ children }: PropsWithChildren) {
 }
 beforeEach(() => {
   vi.clearAllMocks();
+  roleQuery.mockReturnValue({
+    data: ["viewer", "client", "member", "admin", "reviewer"],
+    isPending: false,
+    isError: false,
+    refetch: vi.fn(),
+  });
   inviteMember.mockResolvedValue({
     data: null,
     error: { code: "INVITATION_EMAIL_FAILED", message: "Upstream failure" },
@@ -149,7 +171,11 @@ describe("invitation project access", () => {
     submit();
     await waitFor(() =>
       expect(inviteMember).toHaveBeenCalledWith(
-        expect.objectContaining({ projectAccess: "all", projectIds: [] }),
+        expect.objectContaining({
+          role: "member",
+          projectAccess: "all",
+          projectIds: [],
+        }),
       ),
     );
   });
@@ -222,6 +248,155 @@ describe("invitation project access", () => {
           projectAccess: "selected",
           projectIds: ["project-b"],
         }),
+      ),
+    );
+  });
+});
+
+describe("invitation role selection", () => {
+  beforeEach(() => {
+    inviteMember.mockResolvedValue({ data: { id: "invite-1" }, error: null });
+  });
+
+  async function selectRole(role: string) {
+    fireEvent.click(
+      await screen.findByRole("combobox", {
+        name: "team:inviteModal.roleLabel",
+      }),
+    );
+    const option = await screen.findByRole("option", { name: role });
+    fireEvent.pointerDown(option);
+    fireEvent.mouseDown(option);
+    fireEvent.mouseUp(option);
+    fireEvent.click(option);
+    await waitFor(() =>
+      expect(
+        screen.getByRole("combobox", { name: "team:inviteModal.roleLabel" }),
+      ).toHaveTextContent(role),
+    );
+  }
+
+  function fillAndSubmit() {
+    fireEvent.change(
+      screen.getByPlaceholderText("team:inviteModal.emailPlaceholder"),
+      {
+        target: { value: "client@example.com" },
+      },
+    );
+    fireEvent.click(
+      screen.getByRole("button", { name: "team:inviteModal.sendInvitation" }),
+    );
+  }
+
+  it.each([
+    ["team:roles.client", "client"],
+    ["reviewer", "reviewer"],
+  ])("sends the chosen %s role with project access", async (label, role) => {
+    render(<InviteTeamMemberModal open onClose={vi.fn()} />, { wrapper });
+    await selectRole(label);
+    fillAndSubmit();
+    await waitFor(() =>
+      expect(inviteMember).toHaveBeenCalledWith(
+        expect.objectContaining({
+          role,
+          organizationId: "workspace",
+          projectAccess: "all",
+          projectIds: [],
+        }),
+      ),
+    );
+  });
+
+  it("offers the workspace roles without offering owner", async () => {
+    render(<InviteTeamMemberModal open onClose={vi.fn()} />, { wrapper });
+    fireEvent.click(
+      await screen.findByRole("combobox", {
+        name: "team:inviteModal.roleLabel",
+      }),
+    );
+    expect(
+      await screen.findByRole("option", { name: "team:roles.client" }),
+    ).toBeVisible();
+    expect(screen.getByRole("option", { name: "reviewer" })).toBeVisible();
+    expect(
+      screen.queryByRole("option", { name: "team:roles.owner" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("waits for roles instead of silently sending a member invitation", async () => {
+    roleQuery.mockReturnValue({
+      data: undefined,
+      isPending: true,
+      isError: false,
+      refetch: vi.fn(),
+    });
+    render(<InviteTeamMemberModal open onClose={vi.fn()} />, { wrapper });
+    expect(
+      await screen.findByRole("button", {
+        name: "team:inviteModal.sendInvitation",
+      }),
+    ).toBeDisabled();
+    fireEvent.submit(
+      screen
+        .getByPlaceholderText("team:inviteModal.emailPlaceholder")
+        .closest("form")!,
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByText("team:inviteModal.chooseAvailableRole"),
+      ).toBeVisible(),
+    );
+    expect(inviteMember).not.toHaveBeenCalled();
+  });
+
+  it("shows an actionable error when roles cannot be loaded", async () => {
+    const refetch = vi.fn();
+    roleQuery.mockReturnValue({
+      data: undefined,
+      isPending: false,
+      isError: true,
+      refetch,
+    });
+    render(<InviteTeamMemberModal open onClose={vi.fn()} />, { wrapper });
+    expect(
+      await screen.findByText("team:inviteModal.rolesLoadError"),
+    ).toBeVisible();
+    expect(
+      screen.getByRole("button", { name: "team:inviteModal.sendInvitation" }),
+    ).toBeDisabled();
+    fireEvent.click(
+      screen.getByRole("button", { name: "team:inviteModal.retryRoles" }),
+    );
+    expect(refetch).toHaveBeenCalledOnce();
+    expect(inviteMember).not.toHaveBeenCalled();
+  });
+
+  it("refuses a role that disappears while the invitation is being edited", async () => {
+    const view = render(<InviteTeamMemberModal open onClose={vi.fn()} />, {
+      wrapper,
+    });
+    await selectRole("team:roles.client");
+    roleQuery.mockReturnValue({
+      data: ["member"],
+      isPending: false,
+      isError: false,
+      refetch: vi.fn(),
+    });
+    view.rerender(<InviteTeamMemberModal open onClose={vi.fn()} />);
+    expect(
+      screen.getByRole("combobox", { name: "team:inviteModal.roleLabel" }),
+    ).toHaveTextContent("team:roles.client");
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "team:inviteModal.sendInvitation" }),
+      ).toBeDisabled(),
+    );
+    expect(inviteMember).not.toHaveBeenCalled();
+    await selectRole("team:roles.member");
+    fillAndSubmit();
+    await waitFor(() =>
+      expect(inviteMember).toHaveBeenCalledWith(
+        expect.objectContaining({ role: "member" }),
       ),
     );
   });

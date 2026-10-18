@@ -3659,7 +3659,11 @@
 			"error": "Falha ao convidar membro da equipe",
 			"createdTitle": "Convite criado",
 			"shareLinkDescription": "Compartilhe este link com {{email}} para que ele possa entrar no espaço de trabalho.",
-			"done": "Concluído"
+			"done": "Concluído",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Ainda não há membros na equipe",

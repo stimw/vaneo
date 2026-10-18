@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import type { AriaAttributes } from "react";
 import {
   Select,
   SelectItem,
@@ -8,7 +9,7 @@ import {
 } from "@/components/ui/select";
 import { getWorkspaceRoleLabel } from "./get-workspace-role-label";
 
-type Props = {
+type Props = AriaAttributes & {
   value: string;
   options: readonly string[];
   onValueChange: (role: string) => void;
@@ -28,6 +29,7 @@ function WorkspaceRoleSelect({
   disabled,
   size,
   className,
+  ...ariaProps
 }: Props) {
   const { t } = useTranslation();
   const items = options.map((role) => ({
@@ -40,11 +42,14 @@ function WorkspaceRoleSelect({
       items={items}
       value={value}
       disabled={disabled}
-      onValueChange={(next) => {
+      onValueChange={(next, details) => {
+        // Refreshing options must not silently replace a removed role.
+        if (!options.includes(value) && details.reason === "none") return;
         if (typeof next === "string" && next) onValueChange(next);
       }}
     >
       <SelectTrigger
+        {...ariaProps}
         id={id}
         aria-label={label}
         size={size}

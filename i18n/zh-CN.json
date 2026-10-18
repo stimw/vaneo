@@ -3543,7 +3543,11 @@
 			"error": "邀请团队成员失败",
 			"createdTitle": "邀请已创建",
 			"shareLinkDescription": "将此链接分享给 {{email}}，以便对方加入工作区。",
-			"done": "完成"
+			"done": "完成",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "暂无团队成员",

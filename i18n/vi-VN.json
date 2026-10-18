@@ -3543,7 +3543,11 @@
 			"error": "Không thể mời thành viên nhóm",
 			"createdTitle": "Đã tạo lời mời",
 			"shareLinkDescription": "Chia sẻ liên kết này với {{email}} để họ có thể tham gia không gian làm việc.",
-			"done": "Xong"
+			"done": "Xong",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Chưa có thành viên nhóm nào",

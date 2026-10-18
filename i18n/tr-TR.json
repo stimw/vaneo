@@ -3601,7 +3601,11 @@
 			"error": "Ekip üyesi davet edilemedi",
 			"createdTitle": "Davet oluşturuldu",
 			"shareLinkDescription": "Bu bağlantıyı {{email}} ile paylaşın, böylece çalışma alanına katılabilir.",
-			"done": "Bitti"
+			"done": "Bitti",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Henüz ekip üyesi yok",

@@ -3601,7 +3601,11 @@
 			"error": "Uitnodigen teamlid mislukt",
 			"createdTitle": "Uitnodiging aangemaakt",
 			"shareLinkDescription": "Deel deze link met {{email}} zodat diegene lid kan worden van de werkruimte.",
-			"done": "Klaar"
+			"done": "Klaar",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Nog geen teamleden",

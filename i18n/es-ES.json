@@ -3659,7 +3659,11 @@
 			"error": "Error al invitar miembro al equipo",
 			"createdTitle": "Invitación creada",
 			"shareLinkDescription": "Comparte este enlace con {{email}} para que se una al espacio de trabajo.",
-			"done": "Listo"
+			"done": "Listo",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "No hay miembros en el equipo aún",

@@ -5089,7 +5089,7 @@
               "string",
               "null"
             ],
-            "description": "The caller's workspace role: a built-in role (owner, admin, member, viewer) or the name of a custom role defined in the workspace. Several roles are comma-separated, for example owner,viewer. Null when an instance admin views a workspace they are not a member of."
+            "description": "The caller's workspace role: a built-in role (owner, admin, member, client, viewer) or the name of a custom role defined in the workspace. Several roles are comma-separated, for example owner,viewer. Null when an instance admin views a workspace they are not a member of."
           }
         },
         "required": [
@@ -5122,7 +5122,7 @@
           },
           "role": {
             "type": "string",
-            "description": "The member's workspace role: a built-in role (owner, admin, member, viewer) or the name of a custom role defined in the workspace. Several roles are comma-separated, for example owner,viewer."
+            "description": "The member's workspace role: a built-in role (owner, admin, member, client, viewer) or the name of a custom role defined in the workspace. Several roles are comma-separated, for example owner,viewer."
           }
         },
         "required": [
@@ -24317,6 +24317,74 @@
           },
           "401": {
             "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/ApiKeyRateLimited"
+          }
+        }
+      }
+    },
+    "/workspace/{workspaceId}/invitation-roles": {
+      "get": {
+        "operationId": "getWorkspaceInvitationRoles",
+        "tags": [
+          "Workspaces"
+        ],
+        "summary": "List roles for workspace invitations",
+        "description": "List default and custom role names in this workspace, excluding owner. Requires invitation:create without requiring access to role permission definitions.",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "name": "workspaceId",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Roles available for invitations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing invitation:create permission",
             "content": {
               "application/json": {
                 "schema": {

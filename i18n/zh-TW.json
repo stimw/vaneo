@@ -3543,7 +3543,11 @@
 			"error": "無法邀請團隊成員",
 			"createdTitle": "邀請已建立",
 			"shareLinkDescription": "將此連結分享給 {{email}}，對方即可加入工作區。",
-			"done": "完成"
+			"done": "完成",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "還沒有團隊成員",

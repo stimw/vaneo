@@ -3601,7 +3601,11 @@
 			"error": "Teammitglied konnte nicht eingeladen werden",
 			"createdTitle": "Einladung erstellt",
 			"shareLinkDescription": "Teile diesen Link mit {{email}}, damit die Person dem Workspace beitreten kann.",
-			"done": "Fertig"
+			"done": "Fertig",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Noch keine Teammitglieder",

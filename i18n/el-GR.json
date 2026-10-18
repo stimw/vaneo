@@ -3601,7 +3601,11 @@
 			"error": "Αποτυχία πρόσκλησης μέλους ομάδας",
 			"createdTitle": "Η πρόσκληση δημιουργήθηκε",
 			"shareLinkDescription": "Μοιραστείτε αυτόν τον σύνδεσμο με τον/την {{email}} για να συμμετάσχει στον χώρο εργασίας.",
-			"done": "Ολοκλήρωση"
+			"done": "Ολοκλήρωση",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Δεν υπάρχουν ακόμα μέλη ομάδας",

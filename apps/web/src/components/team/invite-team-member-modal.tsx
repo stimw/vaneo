@@ -5,10 +5,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod/v4";
+import WorkspaceRoleSelect from "@/components/admin/workspace-management/workspace-role-select";
 import useInviteWorkspaceUser from "@/hooks/mutations/workspace-user/use-invite-workspace-user";
 import useGetProjects from "@/hooks/queries/project/use-get-projects";
 import useGetMyProjectAccess from "@/hooks/queries/workspace-users/use-get-my-project-access";
 import useActiveWorkspace from "@/hooks/queries/workspace/use-active-workspace";
+import { useInvitationRoles } from "@/hooks/queries/workspace/use-invitation-roles";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
 import { toast } from "@/lib/toast";
 import { Button } from "../ui/button";
@@ -47,6 +49,7 @@ type Props = {
 
 const teamMemberSchema = z.object({
   email: z.string(),
+  role: z.string().min(1),
 });
 
 type TeamMemberFormValues = z.infer<typeof teamMemberSchema>;
@@ -59,6 +62,11 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
   const workspaceId = workspace?.id;
   const { canInviteUsers } = useWorkspacePermission();
   const canInvite = canInviteUsers();
+  const invitationRoles = useInvitationRoles(
+    workspaceId ?? "",
+    open && canInvite,
+  );
+  const roleOptions = invitationRoles.data ?? [];
   const [createdInvitation, setCreatedInvitation] = useState<{
     id: string;
     email: string;
@@ -84,10 +92,11 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
     resolver: standardSchemaResolver(teamMemberSchema),
     defaultValues: {
       email: "",
+      role: "member",
     },
   });
 
-  const onSubmit = async ({ email }: TeamMemberFormValues) => {
+  const onSubmit = async ({ email, role }: TeamMemberFormValues) => {
     if (!workspaceId) {
       toast.error(t("team:inviteModal.error"));
       return;
@@ -97,6 +106,16 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
       // somehow open without permission we refuse rather than firing a
       // mutation the server will reject.
       toast.error(t("team:inviteModal.error"));
+      return;
+    }
+    if (
+      invitationRoles.isPending ||
+      invitationRoles.isError ||
+      !roleOptions.includes(role)
+    ) {
+      form.setError("role", {
+        message: t("team:inviteModal.chooseAvailableRole"),
+      });
       return;
     }
     const access = toProjectAccessRequest(
@@ -111,9 +130,9 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
       const invitation = await mutateAsync({
         email,
         workspaceId,
-        role: "member",
+        role,
         ...access,
-      }); // TODO: role and email
+      });
       await queryClient.refetchQueries({
         queryKey: ["workspace-users", workspaceId],
       });
@@ -209,6 +228,50 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{t("team:inviteModal.roleLabel")}</FormLabel>
+                      <FormControl>
+                        <WorkspaceRoleSelect
+                          value={field.value}
+                          options={roleOptions}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            form.clearErrors("role");
+                          }}
+                          disabled={
+                            invitationRoles.isPending ||
+                            invitationRoles.isError ||
+                            form.formState.isSubmitting
+                          }
+                          className="w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                      {invitationRoles.isError && (
+                        <div
+                          className="flex items-center justify-between gap-2 text-sm"
+                          role="alert"
+                        >
+                          <p className="text-destructive">
+                            {t("team:inviteModal.rolesLoadError")}
+                          </p>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => void invitationRoles.refetch()}
+                          >
+                            {t("team:inviteModal.retryRoles")}
+                          </Button>
+                        </div>
+                      )}
+                    </FormItem>
+                  )}
+                />
                 <ProjectAccessFields
                   allowAll={!inviterLimited}
                   value={projectAccess}
@@ -236,7 +299,15 @@ function InviteTeamMemberModal({ open, onClose }: Props) {
                 <Button
                   type="submit"
                   size="sm"
-                  disabled={!workspaceId || !canInvite || isMyAccessPending}
+                  disabled={
+                    !workspaceId ||
+                    !canInvite ||
+                    isMyAccessPending ||
+                    invitationRoles.isPending ||
+                    invitationRoles.isError ||
+                    !roleOptions.includes(form.watch("role")) ||
+                    form.formState.isSubmitting
+                  }
                 >
                   {t("team:inviteModal.sendInvitation")}
                 </Button>

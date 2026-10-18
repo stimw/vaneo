@@ -1016,7 +1016,11 @@
 			"error": "Nie udało się zaprosić członka zespołu",
 			"createdTitle": "Zaproszenie utworzone",
 			"shareLinkDescription": "Udostępnij ten link adresowi {{email}}, aby mógł dołączyć do obszaru roboczego.",
-			"done": "Gotowe"
+			"done": "Gotowe",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Brak członków zespołu",

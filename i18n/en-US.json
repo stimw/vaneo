@@ -3594,6 +3594,10 @@
 		},
 		"inviteModal": {
 			"title": "Invite Team Member",
+			"roleLabel": "Role",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"rolesLoadError": "Could not load workspace roles.",
+			"retryRoles": "Retry",
 			"emailLabel": "Email",
 			"emailPlaceholder": "colleague@company.com",
 			"sendInvitation": "Send Invitation",

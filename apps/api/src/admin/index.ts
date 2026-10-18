@@ -10,7 +10,7 @@ import { uploadSettings } from "./upload-settings";
 import addWorkspaceMember from "./controllers/add-workspace-member";
 import listUsers from "./controllers/list-users";
 import listWorkspaceMembers from "./controllers/list-workspace-members";
-import listWorkspaceRoles from "./controllers/list-workspace-roles";
+import listWorkspaceRoles from "../workspace/controllers/list-workspace-roles";
 import listWorkspaces from "./controllers/list-workspaces";
 import removeWorkspaceMember from "./controllers/remove-workspace-member";
 import transferWorkspaceOwnership from "./controllers/transfer-workspace-ownership";

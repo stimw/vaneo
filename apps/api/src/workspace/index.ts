@@ -17,9 +17,11 @@ import getMyProjectAccessCtrl from "./controllers/get-my-project-access";
 import getWorkspaceCtrl from "./controllers/get-workspace";
 import getWorkspaceMembersCtrl from "./controllers/get-workspace-members";
 import listWorkspacesCtrl from "./controllers/list-workspaces";
+import listWorkspaceRoles from "./controllers/list-workspace-roles";
 import updateMemberProjectAccessCtrl from "./controllers/update-member-project-access";
 import {
   memberProjectAccessListSchema,
+  invitationRoleListSchema,
   memberProjectAccessSchema,
   workspaceCapabilitiesSchema,
   workspaceListSchema,
@@ -144,6 +146,29 @@ const getMyCapabilitiesRoute = createRoute({
   },
 });
 
+const getInvitationRolesRoute = createRoute({
+  method: "get",
+  operationId: "getWorkspaceInvitationRoles",
+  path: "/{workspaceId}/invitation-roles",
+  tags: ["Workspaces"],
+  summary: "List roles for workspace invitations",
+  description:
+    "List default and custom role names in this workspace, excluding owner. Requires invitation:create without requiring access to role permission definitions.",
+  middleware: [
+    workspaceAccess.fromParam("workspaceId"),
+    requireWorkspacePermission({ invitation: ["create"] }),
+  ] as const,
+  request: { params: workspaceIdParam },
+  responses: {
+    200: jsonResponse(
+      "Roles available for invitations",
+      invitationRoleListSchema,
+    ),
+    403: errorResponse("Missing invitation:create permission"),
+    404: errorResponse("Workspace not found"),
+  },
+});
+
 const updateMemberProjectAccessRoute = createRoute({
   method: "put",
   operationId: "updateMemberProjectAccess",
@@ -205,6 +230,9 @@ const workspace = apiRouter<BaseVariables & { workspaceId: string }>()
   )
   .openapi(getMyCapabilitiesRoute, async (c) =>
     c.json(getMyCapabilitiesCtrl(await workspacePermissionChecker(c)), 200),
+  )
+  .openapi(getInvitationRolesRoute, async (c) =>
+    c.json(await listWorkspaceRoles(c.get("workspaceId")), 200),
   )
   .openapi(getWorkspaceProjectAccessRoute, async (c) =>
     c.json(

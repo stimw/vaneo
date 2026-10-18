@@ -3769,7 +3769,11 @@
 			"error": "Не удалось пригласить участника команды",
 			"createdTitle": "Приглашение создано",
 			"shareLinkDescription": "Поделитесь этой ссылкой с {{email}}, чтобы этот пользователь мог присоединиться к рабочей области.",
-			"done": "Готово"
+			"done": "Готово",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Участников команды пока нет",

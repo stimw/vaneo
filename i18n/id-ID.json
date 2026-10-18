@@ -3543,7 +3543,11 @@
 			"error": "Gagal mengundang anggota tim",
 			"createdTitle": "Undangan dibuat",
 			"shareLinkDescription": "Bagikan tautan ini kepada {{email}} agar mereka dapat bergabung ke ruang kerja.",
-			"done": "Selesai"
+			"done": "Selesai",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Belum ada anggota tim",

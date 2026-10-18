@@ -3543,7 +3543,11 @@
 			"error": "팀 멤버 초대에 실패했습니다",
 			"createdTitle": "초대가 생성되었습니다",
 			"shareLinkDescription": "{{email}}님이 워크스페이스에 참여할 수 있도록 이 링크를 공유하세요.",
-			"done": "완료"
+			"done": "완료",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "아직 팀 멤버가 없습니다",

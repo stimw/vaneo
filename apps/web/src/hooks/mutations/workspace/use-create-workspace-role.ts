@@ -27,6 +27,9 @@ function useCreateWorkspaceRole() {
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
+        queryKey: ["workspace-invitation-roles", variables.workspaceId],
+      });
+      queryClient.invalidateQueries({
         queryKey: ["workspace-roles", variables.workspaceId],
       });
     },

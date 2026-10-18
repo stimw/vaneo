@@ -3601,7 +3601,11 @@
 			"error": "टीम सदस्य आमंत्रित करने में विफल",
 			"createdTitle": "निमंत्रण बनाया गया",
 			"shareLinkDescription": "यह लिंक {{email}} के साथ साझा करें ताकि वे वर्कस्पेस में शामिल हो सकें।",
-			"done": "हो गया"
+			"done": "हो गया",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "अभी तक कोई टीम सदस्य नहीं",

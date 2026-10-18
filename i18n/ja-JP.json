@@ -3543,7 +3543,11 @@
 			"error": "チームメンバーの招待に失敗しました",
 			"createdTitle": "招待を作成しました",
 			"shareLinkDescription": "{{email}} にこのリンクを共有して、ワークスペースに参加してもらいましょう。",
-			"done": "完了"
+			"done": "完了",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "チームメンバーがまだいません",

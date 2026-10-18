@@ -3717,7 +3717,11 @@
 			"error": "Не вдалося запросити учасника команди",
 			"createdTitle": "Запрошення створено",
 			"shareLinkDescription": "Поділіться цим посиланням з {{email}}, щоб вони могли приєднатися до робочого простору.",
-			"done": "Готово"
+			"done": "Готово",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Учасників команди ще немає",

@@ -3601,7 +3601,11 @@
 			"error": "Komanda üzvünü dəvət etmək alınmadı",
 			"createdTitle": "Dəvət yaradıldı",
 			"shareLinkDescription": "İş sahəsinə qoşula bilməsi üçün bu keçidi {{email}} ilə paylaşın.",
-			"done": "Hazırdır"
+			"done": "Hazırdır",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Hələ komanda üzvü yoxdur",

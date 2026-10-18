@@ -3601,7 +3601,11 @@
 			"error": "Неуспешно поканување на член на тим",
 			"createdTitle": "Поканата е креирана",
 			"shareLinkDescription": "Сподели го овој линк со {{email}} за да може да се приклучи на работниот простор.",
-			"done": "Готово"
+			"done": "Готово",
+			"chooseAvailableRole": "Choose a role available in this workspace.",
+			"retryRoles": "Retry",
+			"roleLabel": "Role",
+			"rolesLoadError": "Could not load workspace roles."
 		},
 		"membersTable": {
 			"emptyTitle": "Нема членови на тим засега",

@@ -14551,6 +14551,18 @@
 						},
 						"done": {
 							"type": "string"
+						},
+						"roleLabel": {
+							"type": "string"
+						},
+						"chooseAvailableRole": {
+							"type": "string"
+						},
+						"rolesLoadError": {
+							"type": "string"
+						},
+						"retryRoles": {
+							"type": "string"
 						}
 					},
 					"required": [
@@ -14562,7 +14574,11 @@
 						"error",
 						"createdTitle",
 						"shareLinkDescription",
-						"done"
+						"done",
+						"roleLabel",
+						"chooseAvailableRole",
+						"rolesLoadError",
+						"retryRoles"
 					]
 				},
 				"membersTable": {

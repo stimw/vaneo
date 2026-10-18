@@ -3,7 +3,7 @@ import { authClient } from "@/lib/auth-client";
 export type InviteWorkspaceMemberRequest = {
   workspaceId: string;
   email: string;
-  role?: "owner" | "admin" | "member";
+  role?: string;
 };
 
 const inviteWorkspaceMember = async ({

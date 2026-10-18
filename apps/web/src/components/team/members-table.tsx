@@ -16,6 +16,7 @@ import useCancelInvitation from "@/hooks/mutations/workspace-user/use-cancel-inv
 import useDeleteWorkspaceUser from "@/hooks/mutations/workspace-user/use-delete-workspace-user";
 import useUpdateWorkspaceUserRole from "@/hooks/mutations/workspace-user/use-update-workspace-user-role";
 import useWorkspaceRoles from "@/hooks/queries/workspace/use-workspace-roles";
+import WorkspaceRoleSelect from "@/components/admin/workspace-management/workspace-role-select";
 import useGetMyProjectAccess from "@/hooks/queries/workspace-users/use-get-my-project-access";
 import useGetWorkspaceProjectAccess from "@/hooks/queries/workspace-users/use-get-workspace-project-access";
 import { useCopyInvitationLink } from "@/hooks/use-copy-invitation-link";
@@ -42,13 +43,6 @@ import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Menu, MenuItem, MenuPopup, MenuTrigger } from "../ui/menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import {
   Table,
   TableBody,
@@ -83,7 +77,7 @@ const AVATAR_TONES = [
   "bg-indigo-500/15 text-indigo-600 dark:text-indigo-300",
 ] as const;
 
-// Names that are NOT "truly custom": viewer/member/admin are seeded as
+// Default roles are seeded as
 // editable workspace_role rows on every workspace creation, and owner is a
 // static built-in. The Select already lists them as built-ins, so we filter
 // them out of the custom-roles tail to avoid duplicate options.
@@ -306,42 +300,19 @@ function MembersTable({ workspaceId, invitations, users }: Props) {
                       {t("team:roles.owner", { defaultValue: "Owner" })}
                     </Badge>
                   ) : showRoleSelect ? (
-                    <Select
+                    <WorkspaceRoleSelect
                       value={member.role}
+                      options={[
+                        ...DEFAULT_ROLE_NAMES,
+                        ...customRoles.map((role) => role.role),
+                      ]}
                       onValueChange={(value) => {
-                        if (typeof value === "string" && value) {
-                          handleChangeRole(member, value);
-                        }
+                        void handleChangeRole(member, value);
                       }}
-                    >
-                      <SelectTrigger size="sm" className="h-8 w-32">
-                        <SelectValue>
-                          {t(`team:roles.${member.role}`, {
-                            defaultValue: capitalize(member.role),
-                          })}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="viewer">
-                          {t("team:roles.viewer", { defaultValue: "Viewer" })}
-                        </SelectItem>
-                        <SelectItem value="member">
-                          {t("team:roles.member", { defaultValue: "Member" })}
-                        </SelectItem>
-                        <SelectItem value="admin">
-                          {t("team:roles.admin", { defaultValue: "Admin" })}
-                        </SelectItem>
-                        {/* Owner is intentionally NOT offered here: the better-auth
-                            organization plugin requires an explicit ownership
-                            transfer flow (a workspace must have exactly one owner).
-                            That UI lives in workspace settings (TODO). */}
-                        {customRoles.map((r) => (
-                          <SelectItem key={r.id} value={r.role}>
-                            {capitalize(r.role)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      label={t("team:membersTable.columns.role")}
+                      size="sm"
+                      className="h-8 w-32"
+                    />
                   ) : (
                     <Badge variant="secondary" className="capitalize">
                       {t(`team:roles.${member.role}`, {
