@@ -3400,9 +3400,7 @@
 			"edit": "Edit time for {{date}}",
 			"empty": "No dated time logs yet.",
 			"more": "Show earlier logs",
-			"undated": "Undated balance",
-			"adjust": "Adjust historical total",
-			"adjustHint": "Set the task’s cumulative total. This adjustment has no work date and is excluded from Time logged reports."
+			"undated": "Undated balance"
 		},
 		"workReport": {
 			"timeLogged": "Time logged",

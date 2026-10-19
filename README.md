@@ -6,7 +6,7 @@ Vaneo is an independent, self-hosted project management application maintained b
 source history and MIT attribution preserved.
 
 Vaneo retains Kaneo's task and project functionality and adds browser image
-compression, an editable task time total and completion-period reports. More detailed
+compression, dated work logs, cumulative task time and project time reports. More detailed
 permissions for internal tasks and exports remain planned.
 
 Development and releases follow Vaneo's own roadmap. Relevant upstream changes,
@@ -14,24 +14,31 @@ including improvements to the time-entry UI, can be adopted selectively.
 
 ## Time tracking and reports
 
-The task properties sidebar shows **Time**. Open it to set one total in hours
-(for example, `2.5` for two and a half hours), then save or press Enter.
-Project participants can read it; setting the total requires `timeEntry:update`
-in Workspace settings → Roles. Members, admins and owners have this permission
-by default; custom client roles do not unless explicitly granted. Editing tasks
-does not grant permission to edit time.
+The task properties sidebar shows **Time spent**. Open it to log hours against a work
+date, or edit and remove an existing dated log. New logs and corrections use
+15-minute increments, with a minimum of 15 minutes. Historical allocations may
+exceed 24 hours on one date. The cumulative total updates automatically;
+overwriting it directly is no longer supported.
 
-Existing time entries are preserved for CLI/MCP use and initialize the total on
-upgrade. New closed entries add their time; editing an entry adjusts the total
-by its duration difference. Running entries add time when stopped. Manual total
-corrections do not delete or rewrite previous entries.
+Project participants can read time. Logging, editing and deleting require the
+corresponding `timeEntry:create`, `timeEntry:update` and `timeEntry:delete`
+permissions in Workspace settings → Roles. The default Client role can view
+time but cannot modify it. Editing tasks does not grant permission to edit time.
+
+The **Time logged** report counts dated work logs and stopped timer entries in
+the selected period, including work on ongoing tasks. Existing undated historical
+balances remain visible in cumulative totals but are excluded from period reports.
+Existing timer entries remain available through the CLI and MCP. Running timers
+add to cumulative totals when stopped; changing a closed entry adjusts the total
+by its duration difference.
 
 Under **Project settings → General → Tasks → Completed tasks & time**, choose
 an inclusive completion date range and download JSON. Dates use the browser's
 time zone. The report includes each selected task's current total, any historical
-time entries (even outside the period), and an overall total in seconds. Manual
-corrections are reflected in the totals, so those can differ from the old entry
-sum. Running entries are listed but excluded until stopped.
+time entries (even outside the period), and an overall total in seconds. Cumulative
+totals include dated work logs and existing historical balances, so those can
+differ from the old timer entry sum. Running entries are listed but excluded
+until stopped.
 
 Completion follows the project's final workflow columns. Ordinary edits do not
 change a completion date; reopening clears it, and completing again records a
@@ -42,8 +49,11 @@ without a known date are excluded and counted in `unknownCompletionCount`.
 Agents can use the built-in `export_completed_tasks` MCP tool or call
 `GET /api/task/completed-export/{projectId}` with `from` (inclusive), `to`
 (exclusive) and `timeZone`. CLI users can access it through `kaneo api`.
-Use `get_task_time` / `set_task_time` in MCP or
-`GET` / `PUT /api/time-entry/task/{taskId}/total` for the editable task total.
+Use `get_task_time` in MCP or `GET /api/time-entry/task/{taskId}/total` to read
+cumulative task time. Read and create dated logs with `GET` / `POST` at
+`/api/time-entry/task/{taskId}/logs`; edit or delete them with `PUT` / `DELETE`
+at `/api/time-entry/task/{taskId}/logs/{id}`. Writes to the old absolute-total
+endpoint have been removed.
 
 ## Development
 

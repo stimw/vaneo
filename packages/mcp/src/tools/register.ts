@@ -800,28 +800,6 @@ export function registerTools(
   );
 
   registerTool(
-    "set_task_time",
-    {
-      description:
-        "Set the task's absolute time total in seconds. Existing time entries are preserved. Requires timeEntry:update permission.",
-      inputSchema: z.object({
-        taskId: nonEmptyString,
-        totalSeconds: z.number().int().min(0).max(2_147_483_647),
-      }),
-    },
-    async (args) =>
-      run(() =>
-        client.json(
-          `/api/time-entry/task/${encodeURIComponent(args.taskId)}/total`,
-          {
-            method: "PUT",
-            body: JSON.stringify({ totalSeconds: args.totalSeconds }),
-          },
-        ),
-      ),
-  );
-
-  registerTool(
     "get_time_entry",
     {
       description: "Get a single time entry by ID.",

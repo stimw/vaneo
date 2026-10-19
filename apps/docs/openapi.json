@@ -1497,7 +1497,7 @@
           },
           "trackedSeconds": {
             "type": "number",
-            "description": "Manually editable task time total in seconds, excluding running entries. Use the task time-total endpoints to read and set it."
+            "description": "Cumulative task time in seconds, excluding running entries and including any existing undated historical balance. Dated work logs and stopped timers update it automatically."
           },
           "estimatedSeconds": {
             "type": [
@@ -13238,7 +13238,7 @@
           "Tasks"
         ],
         "summary": "Export completed tasks and all their time entries",
-        "description": "Currently completed tasks, including completed tasks that were archived, whose most recent completion falls in [from, to). Totals use the editable task time total, including manual corrections. Historical time entries are included even outside the period; their sum may differ from a corrected total. Running entries are listed but excluded until stopped. Historical tasks with unknown completion dates are counted separately. Completion follows the project's final workflow columns.",
+        "description": "Currently completed tasks, including completed tasks that were archived, whose most recent completion falls in [from, to). Totals use cumulative task time, including any existing undated historical balance. Historical time entries are included even outside the period; their sum may differ from the cumulative total when dated work logs or historical balances exist. Running entries are listed but excluded until stopped. Historical tasks with unknown completion dates are counted separately. Completion follows the project's final workflow columns.",
         "parameters": [
           {
             "schema": {
@@ -13391,7 +13391,7 @@
           "Tasks"
         ],
         "summary": "Get completed task time aggregates",
-        "description": "Period totals, daily activity in the supplied time zone, and three tasks with the most time. Uses current corrected task totals grouped by completion date. Includes completed archived tasks; reopened tasks are excluded. Does not load descriptions or time entries.",
+        "description": "Period totals, daily activity in the supplied time zone, and three tasks with the most time. Uses cumulative task time grouped by completion date, including any existing historical balances. Includes completed archived tasks; reopened tasks are excluded. Does not load descriptions or time entries.",
         "parameters": [
           {
             "schema": {
@@ -16449,7 +16449,7 @@
           "Time Entries"
         ],
         "summary": "Get the task's time total",
-        "description": "Read the manually editable task total in seconds. Running entries are excluded until stopped.",
+        "description": "Read the cumulative task time in seconds, including any existing undated historical balance. Time logs and stopped timers update this total automatically. Running entries are excluded until stopped.",
         "parameters": [
           {
             "schema": {
@@ -16483,99 +16483,6 @@
           },
           "403": {
             "description": "No access to the project",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Task not found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "429": {
-            "$ref": "#/components/responses/ApiKeyRateLimited"
-          }
-        }
-      },
-      "put": {
-        "operationId": "setTaskTime",
-        "tags": [
-          "Time Entries"
-        ],
-        "summary": "Set the task's time total",
-        "description": "Set an absolute total in seconds without deleting existing time entries. Subsequent time-entry changes adjust this total by their duration difference.",
-        "parameters": [
-          {
-            "schema": {
-              "type": "string"
-            },
-            "required": true,
-            "name": "taskId",
-            "in": "path"
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "totalSeconds": {
-                    "type": "integer",
-                    "minimum": 0,
-                    "maximum": 2147483647
-                  }
-                },
-                "required": [
-                  "totalSeconds"
-                ]
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Task time total",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TaskTimeTotal"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid duration",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing or invalid credentials",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiError"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "No access to the project, or missing timeEntry:update permission",
             "content": {
               "application/json": {
                 "schema": {

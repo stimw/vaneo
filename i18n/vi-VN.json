@@ -3337,8 +3337,6 @@
 			"save": "Save"
 		},
 		"worklog": {
-			"adjust": "Adjust historical total",
-			"adjustHint": "Set the task’s cumulative total. This adjustment has no work date and is excluded from Time logged reports.",
 			"confirmDelete": "Delete this log and subtract its hours from the task total?",
 			"date": "Work date",
 			"delete": "Delete time log",

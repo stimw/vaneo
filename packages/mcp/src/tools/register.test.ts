@@ -70,7 +70,7 @@ describe("registerTools", () => {
     );
   });
 
-  it("reads and sets the absolute task time total using the dedicated endpoints", async () => {
+  it("reads cumulative task time without exposing a tool to overwrite it", async () => {
     const { server, tools } = createServerMock();
     const client = {
       json: vi.fn().mockResolvedValue({ taskId: "task 1", totalSeconds: 9000 }),
@@ -80,13 +80,8 @@ describe("registerTools", () => {
     expect(client.json).toHaveBeenLastCalledWith(
       "/api/time-entry/task/task%201/total",
     );
-    await tools
-      .get("set_task_time")
-      ?.handler({ taskId: "task 1", totalSeconds: 9000 });
-    expect(client.json).toHaveBeenLastCalledWith(
-      "/api/time-entry/task/task%201/total",
-      { method: "PUT", body: JSON.stringify({ totalSeconds: 9000 }) },
-    );
+    expect(tools.has("set_task_time")).toBe(false);
+    expect(client.json).toHaveBeenCalledOnce();
   });
 
   it("uses the API-key current-user endpoint for whoami", async () => {

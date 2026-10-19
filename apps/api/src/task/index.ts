@@ -480,7 +480,7 @@ const exportCompletedTasksRoute = createRoute({
   tags: ["Tasks"],
   summary: "Export completed tasks and all their time entries",
   description:
-    "Currently completed tasks, including completed tasks that were archived, whose most recent completion falls in [from, to). Totals use the editable task time total, including manual corrections. Historical time entries are included even outside the period; their sum may differ from a corrected total. Running entries are listed but excluded until stopped. Historical tasks with unknown completion dates are counted separately. Completion follows the project's final workflow columns.",
+    "Currently completed tasks, including completed tasks that were archived, whose most recent completion falls in [from, to). Totals use cumulative task time, including any existing undated historical balance. Historical time entries are included even outside the period; their sum may differ from the cumulative total when dated work logs or historical balances exist. Running entries are listed but excluded until stopped. Historical tasks with unknown completion dates are counted separately. Completion follows the project's final workflow columns.",
   middleware: [
     workspaceAccess.fromProject("projectId"),
     requireWorkspacePermission({ task: ["read"] }),
@@ -501,7 +501,7 @@ const completedReportRoute = createRoute({
   tags: ["Tasks"],
   summary: "Get completed task time aggregates",
   description:
-    "Period totals, daily activity in the supplied time zone, and three tasks with the most time. Uses current corrected task totals grouped by completion date. Includes completed archived tasks; reopened tasks are excluded. Does not load descriptions or time entries.",
+    "Period totals, daily activity in the supplied time zone, and three tasks with the most time. Uses cumulative task time grouped by completion date, including any existing historical balances. Includes completed archived tasks; reopened tasks are excluded. Does not load descriptions or time entries.",
   middleware: [
     workspaceAccess.fromProject("projectId"),
     requireWorkspacePermission({ task: ["read"] }),

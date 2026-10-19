@@ -30,7 +30,7 @@ export const taskSchema = z
     dueDate: nullableResponseTimestamp,
     trackedSeconds: z.number().optional().openapi({
       description:
-        "Manually editable task time total in seconds, excluding running entries. Use the task time-total endpoints to read and set it.",
+        "Cumulative task time in seconds, excluding running entries and including any existing undated historical balance. Dated work logs and stopped timers update it automatically.",
     }),
     estimatedSeconds: z.number().nullable().optional(),
     progress: z.number().int().min(0).max(100).nullable().optional().openapi({

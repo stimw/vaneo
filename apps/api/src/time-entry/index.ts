@@ -12,7 +12,6 @@ import getTimeEntriesByTaskId from "./controllers/get-time-entries";
 import getTimeEntry from "./controllers/get-time-entry";
 import updateTimeEntry from "./controllers/update-time-entry";
 import getTaskTime from "./controllers/get-task-time";
-import setTaskTime from "./controllers/set-task-time";
 import {
   timeEntryListSchema,
   timeEntrySchema,
@@ -21,7 +20,6 @@ import {
 import {
   createTimeEntryBody,
   taskIdParam,
-  setTaskTimeBody,
   timeEntryParam,
   updateTimeEntryBody,
 } from "./schema";
@@ -122,7 +120,7 @@ const getTaskTimeRoute = createRoute({
   tags: ["Time Entries"],
   summary: "Get the task's time total",
   description:
-    "Read the manually editable task total in seconds. Running entries are excluded until stopped.",
+    "Read the cumulative task time in seconds, including any existing undated historical balance. Time logs and stopped timers update this total automatically. Running entries are excluded until stopped.",
   middleware: [workspaceAccess.fromTaskId()] as const,
   request: { params: taskIdParam },
   responses: {
@@ -132,48 +130,10 @@ const getTaskTimeRoute = createRoute({
   },
 });
 
-const setTaskTimeRoute = createRoute({
-  method: "put",
-  operationId: "setTaskTime",
-  path: "/task/{taskId}/total",
-  tags: ["Time Entries"],
-  summary: "Set the task's time total",
-  description:
-    "Set an absolute total in seconds without deleting existing time entries. Subsequent time-entry changes adjust this total by their duration difference.",
-  middleware: [
-    workspaceAccess.fromTaskId(),
-    requireWorkspacePermission({ timeEntry: ["update"] }),
-  ] as const,
-  request: {
-    params: taskIdParam,
-    body: {
-      required: true,
-      content: { "application/json": { schema: setTaskTimeBody } },
-    },
-  },
-  responses: {
-    200: jsonResponse("Task time total", taskTimeSchema),
-    400: errorResponse("Invalid duration"),
-    403: errorResponse(
-      "No access to the project, or missing timeEntry:update permission",
-    ),
-    404: errorResponse("Task not found"),
-  },
-});
-
 const timeEntry = apiRouter()
   .route("/", worklogs)
   .openapi(getTaskTimeRoute, async (c) =>
     c.json(await getTaskTime(c.req.valid("param").taskId), 200),
-  )
-  .openapi(setTaskTimeRoute, async (c) =>
-    c.json(
-      await setTaskTime(
-        c.req.valid("param").taskId,
-        c.req.valid("json").totalSeconds,
-      ),
-      200,
-    ),
   )
   .openapi(getTaskTimeEntriesRoute, async (c) =>
     c.json(await getTimeEntriesByTaskId(c.req.valid("param").taskId), 200),

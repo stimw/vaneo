@@ -6,17 +6,10 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import { getWorklogs } from "@/fetchers/time-entry/worklogs";
 import { useWorkspacePermission } from "@/hooks/use-workspace-permission";
-import { TimeTotalForm } from "./time-total-form";
 import { formatTrackedTime } from "./time-values";
 import { WorklogForm } from "./worklog-form";
 
-export function WorklogPanel({
-  taskId,
-  totalSeconds,
-}: {
-  taskId: string;
-  totalSeconds: number;
-}) {
+export function WorklogPanel({ taskId }: { taskId: string }) {
   const { t } = useTranslation();
   const { canCreateTimeEntries, canUpdateTimeEntries } =
     useWorkspacePermission();
@@ -25,7 +18,6 @@ export function WorklogPanel({
     workDate: string;
     duration: number;
   }>();
-  const [adjusting, setAdjusting] = useState(false);
   const query = useInfiniteQuery({
     queryKey: ["time-entries", taskId, "logs"],
     queryFn: ({ pageParam, signal }) => getWorklogs(taskId, pageParam, signal),
@@ -85,7 +77,6 @@ export function WorklogPanel({
                     })}
                     onClick={() => {
                       setEditing(entry);
-                      setAdjusting(false);
                     }}
                   >
                     <Pencil />
@@ -120,43 +111,6 @@ export function WorklogPanel({
               </div>
             )}
           </div>
-          {canUpdateTimeEntries() && (
-            <div className="border-t pt-2">
-              {adjusting ? (
-                <>
-                  <p className="mb-2 text-[11px] text-muted-foreground">
-                    {t("tasks:worklog.adjustHint")}
-                  </p>
-                  <TimeTotalForm
-                    taskId={taskId}
-                    totalSeconds={totalSeconds}
-                    onSaved={() => setAdjusting(false)}
-                  />
-                  <Button
-                    type="button"
-                    size="xs"
-                    variant="ghost"
-                    onClick={() => setAdjusting(false)}
-                  >
-                    {t("common:actions.cancel")}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  type="button"
-                  size="xs"
-                  variant="ghost"
-                  className="text-muted-foreground"
-                  onClick={() => {
-                    setAdjusting(true);
-                    setEditing(undefined);
-                  }}
-                >
-                  {t("tasks:worklog.adjust")}
-                </Button>
-              )}
-            </div>
-          )}
         </>
       )}
     </div>

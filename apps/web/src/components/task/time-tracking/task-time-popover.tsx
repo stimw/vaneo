@@ -58,10 +58,7 @@ export function TaskTimePopover({
             </Button>
           </>
         ) : query.data ? (
-          <WorklogPanel
-            taskId={taskId}
-            totalSeconds={query.data.totalSeconds}
-          />
+          <WorklogPanel taskId={taskId} />
         ) : null}
       </PopoverPopup>
     </Popover>

@@ -29,10 +29,6 @@ export const timestamp = z
   .openapi({ format: "date-time", example: "2026-01-31T09:00:00Z" });
 
 export const taskIdParam = z.object({ taskId: z.string() });
-export const setTaskTimeBody = z.object({
-  totalSeconds: z.number().int().min(0).max(2_147_483_647),
-});
-
 export const timeEntryParam = z.object({ id: z.string() });
 
 export const createTimeEntryBody = z.object({

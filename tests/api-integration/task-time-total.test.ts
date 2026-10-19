@@ -56,8 +56,64 @@ async function fixture() {
   };
 }
 
-describe("editable task time total", () => {
-  it("replaces and clears the total, keeps legacy records and exports the corrected value", async () => {
+describe("cumulative task time total", () => {
+  it("removes the absolute-total write route while preserving historical balances and dated records", async () => {
+    const f = await fixture();
+    await db
+      .update(schema.taskTable)
+      .set({ trackedSeconds: 7200 })
+      .where(eq(schema.taskTable.id, f.task.id));
+    const logged = await f.app.request(
+      `/api/time-entry/task/${f.task.id}/logs`,
+      json("POST", { workDate: "2026-10-14", duration: 900 }),
+    );
+    expect(logged.status).toBe(200);
+    const before = await db.query.taskTable.findFirst({
+      where: eq(schema.taskTable.id, f.task.id),
+    });
+    const entries = await db.query.timeEntryTable.findMany({
+      where: eq(schema.timeEntryTable.taskId, f.task.id),
+    });
+    const logs = await db.query.taskWorklogTable.findMany({
+      where: eq(schema.taskWorklogTable.taskId, f.task.id),
+    });
+    for (const totalSeconds of [0, 1800, 8100, -1, null]) {
+      expect(
+        (await f.app.request(f.url, json("PUT", { totalSeconds }))).status,
+      ).toBe(404);
+    }
+    expect(await f.get()).toEqual({ taskId: f.task.id, totalSeconds: 8100 });
+    expect(
+      await db.query.taskTable.findFirst({
+        where: eq(schema.taskTable.id, f.task.id),
+      }),
+    ).toEqual(before);
+    expect(
+      await db.query.timeEntryTable.findMany({
+        where: eq(schema.timeEntryTable.taskId, f.task.id),
+      }),
+    ).toEqual(entries);
+    expect(
+      await db.query.taskWorklogTable.findMany({
+        where: eq(schema.taskWorklogTable.taskId, f.task.id),
+      }),
+    ).toEqual(logs);
+    const detail = await (
+      await f.app.request(`/api/time-entry/task/${f.task.id}/logs`)
+    ).json();
+    expect(detail).toMatchObject({
+      totalSeconds: 8100,
+      unallocatedSeconds: 3600,
+      total: 1,
+    });
+    const spec = await (await f.app.request("/api/openapi")).json();
+    expect(spec.paths["/time-entry/task/{taskId}/total"].get.operationId).toBe(
+      "getTaskTime",
+    );
+    expect(spec.paths["/time-entry/task/{taskId}/total"].put).toBeUndefined();
+  });
+
+  it("keeps existing historical totals and exported values without rewriting legacy entries", async () => {
     const f = await fixture();
     await db.insert(schema.timeEntryTable).values({
       taskId: f.task.id,
@@ -69,11 +125,10 @@ describe("editable task time total", () => {
     const before = await db.query.timeEntryTable.findMany({
       where: eq(schema.timeEntryTable.taskId, f.task.id),
     });
-    expect((await f.get()).totalSeconds).toBe(10800);
-    expect(
-      (await f.app.request(f.url, json("PUT", { totalSeconds: 1800 }))).status,
-    ).toBe(200);
-    expect((await f.get()).totalSeconds).toBe(1800);
+    await db
+      .update(schema.taskTable)
+      .set({ trackedSeconds: 1800 })
+      .where(eq(schema.taskTable.id, f.task.id));
     const report = await (
       await f.app.request(
         `/api/task/completed-export/${f.project.id}?from=2026-10-01T00:00:00Z&to=2026-11-01T00:00:00Z`,
@@ -82,10 +137,6 @@ describe("editable task time total", () => {
     expect(report.summary.totalSeconds).toBe(1800);
     expect(report.tasks[0].totalSeconds).toBe(1800);
     expect(report.tasks[0].timeEntries).toHaveLength(2);
-    expect(
-      (await f.app.request(f.url, json("PUT", { totalSeconds: 0 }))).status,
-    ).toBe(200);
-    expect((await f.get()).totalSeconds).toBe(0);
     expect(
       await db.query.timeEntryTable.findMany({
         where: eq(schema.timeEntryTable.taskId, f.task.id),
@@ -99,7 +150,10 @@ describe("editable task time total", () => {
 
   it("retains manual corrections as timers stop and existing entries change", async () => {
     const f = await fixture();
-    await f.app.request(f.url, json("PUT", { totalSeconds: 7200 }));
+    await db
+      .update(schema.taskTable)
+      .set({ trackedSeconds: 7200 })
+      .where(eq(schema.taskTable.id, f.task.id));
     const running = await (
       await f.app.request(
         "/api/time-entry",
@@ -133,7 +187,10 @@ describe("editable task time total", () => {
 
   it("serializes concurrent legacy time-entry additions", async () => {
     const f = await fixture();
-    await f.app.request(f.url, json("PUT", { totalSeconds: 9000 }));
+    await db
+      .update(schema.taskTable)
+      .set({ trackedSeconds: 9000 })
+      .where(eq(schema.taskTable.id, f.task.id));
     const responses = await Promise.all(
       Array.from({ length: 4 }, () =>
         f.app.request(
@@ -150,7 +207,7 @@ describe("editable task time total", () => {
     expect((await f.get()).totalSeconds).toBe(11400);
   });
 
-  it("backfills old entries from timestamps and rejects invalid total values", async () => {
+  it("backfills old entries from timestamps for cumulative reads", async () => {
     const f = await fixture();
     await db
       .update(schema.taskTable)
@@ -166,11 +223,6 @@ describe("editable task time total", () => {
       .split("--> statement-breakpoint")
       .find((s) => s.includes("UPDATE task t SET tracked_seconds"))!;
     await db.execute(sql.raw(backfill));
-    expect((await f.get()).totalSeconds).toBe(3600);
-    for (const totalSeconds of [-1, 1.5, null, 2_147_483_648])
-      expect(
-        (await f.app.request(f.url, json("PUT", { totalSeconds }))).status,
-      ).toBe(400);
     expect((await f.get()).totalSeconds).toBe(3600);
   });
 });

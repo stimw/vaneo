@@ -106,7 +106,7 @@ describe("time-entry permissions", () => {
           json("PUT", { totalSeconds: 0 }),
         )
       ).status,
-    ).toBe(403);
+    ).toBe(404);
     const capabilities = await (
       await f.app.request(`/api/workspace/${f.workspace.id}/capabilities`)
     ).json();
