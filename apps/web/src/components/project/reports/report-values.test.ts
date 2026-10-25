@@ -59,3 +59,20 @@ it("exports period time, lifetime time and manual progress without estimates", (
   expect(csv).toContain('"2026-10-02","2","10","45","in-progress"');
   expect(csv).toContain('"\'+unsafe"');
 });
+
+describe("category exports", () => {
+  it("exports one category per task in both bases, escaping spreadsheet formulas", () => {
+    const row = {
+      ...task("1", 2, 3600),
+      category: "=Sales",
+      trackedSeconds: 3600,
+      loggedAt: "2026-10-02",
+    };
+    for (const basis of ["logged", "completed"] as const) {
+      const csv = reportCsv([row], basis);
+      expect(csv).toContain('"Category"');
+      expect(csv).toContain('"\'=Sales"');
+      expect(csv.split("\r\n")).toHaveLength(2);
+    }
+  });
+});

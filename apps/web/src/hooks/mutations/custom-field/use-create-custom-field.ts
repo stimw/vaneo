@@ -8,6 +8,7 @@ function useCreateCustomField() {
   return useMutation({
     mutationFn: createCustomField,
     onSuccess: (created, variables: CreateCustomFieldRequest) => {
+      void queryClient.invalidateQueries({ queryKey: ["completed-reports"] });
       queryClient.setQueryData(
         ["custom-fields", variables.projectId],
         (existing: Array<typeof created> | undefined) => {

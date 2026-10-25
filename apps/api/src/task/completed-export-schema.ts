@@ -1,9 +1,14 @@
 import { responseTimestamp, z } from "../openapi";
 import { timeEntryListSchema } from "../time-entry/response";
+import {
+  reportCategoryQuery,
+  reportCategoryFieldSchema,
+} from "./report-category";
 import { timestamp } from "../time-entry/schema";
 
 export const completedExportQuery = z
   .object({
+    ...reportCategoryQuery,
     from: timestamp.openapi({ description: "Inclusive completion timestamp." }),
     to: timestamp.openapi({ description: "Exclusive completion timestamp." }),
     timeZone: z
@@ -28,6 +33,7 @@ export const completedExportSchema = z
   .object({
     version: z.literal(1),
     exportedAt: responseTimestamp,
+    categoryField: reportCategoryFieldSchema,
     project: z.object({ id: z.string(), name: z.string(), slug: z.string() }),
     period: z.object({
       from: responseTimestamp,
@@ -45,6 +51,7 @@ export const completedExportSchema = z
         id: z.string(),
         ticketId: z.string(),
         title: z.string(),
+        category: z.string().nullable(),
         description: z.string().nullable(),
         status: z.string(),
         completedAt: responseTimestamp,

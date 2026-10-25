@@ -1,5 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
+import { resolveReportCategory } from "../report-category";
 import db from "../../database";
 import { projectTable, taskTable, userTable } from "../../database/schema";
 import type { CompletedReportPageQuery } from "../completed-report-schema";
@@ -23,7 +24,9 @@ export default async function getCompletedReportPage(
       });
       if (!project)
         throw new HTTPException(404, { message: "Project not found" });
+      const category = await resolveReportCategory(tx, projectId, query);
       const baseWhere = and(
+        category.where,
         reportPeriodWhere(projectId, query),
         reportFilterWhere(project.slug, query),
       );
@@ -46,7 +49,7 @@ export default async function getCompletedReportPage(
           }
         : baseTotals;
       const tasks = await tx
-        .select(reportTaskFields(project.slug))
+        .select(reportTaskFields(project.slug, category.value))
         .from(taskTable)
         .leftJoin(userTable, eq(taskTable.userId, userTable.id))
         .where(where)

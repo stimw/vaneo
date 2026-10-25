@@ -32,6 +32,7 @@ import { ReportPagination } from "./report-pagination";
 
 export function ReportTasksTable({
   tasks,
+  categoryName,
   basis = "completed",
   totalCount,
   totalSeconds,
@@ -56,6 +57,7 @@ export function ReportTasksTable({
   onTaskSelect,
 }: {
   tasks: ReportTask[];
+  categoryName?: string;
   basis?: ReportBasis;
   totalCount: number;
   totalSeconds: number;
@@ -163,6 +165,11 @@ export function ReportTasksTable({
             <TableHead className="ps-5 text-xs sm:ps-7">
               {t("tasks:reports.task")}
             </TableHead>
+            {categoryName && (
+              <TableHead className="hidden w-32 text-xs md:table-cell">
+                {categoryName}
+              </TableHead>
+            )}
             <TableHead className="hidden w-40 text-xs md:table-cell">
               {t("tasks:reports.assignee")}
             </TableHead>
@@ -262,6 +269,11 @@ export function ReportTasksTable({
                   </div>
                 </div>
               </TableCell>
+              {categoryName && (
+                <TableCell className="hidden text-xs md:table-cell">
+                  {task.category ?? t("tasks:reports.uncategorized")}
+                </TableCell>
+              )}
               <TableCell className="hidden text-xs text-muted-foreground md:table-cell">
                 <span className="block truncate">
                   {task.assigneeName ?? t("tasks:reports.unassigned")}
@@ -288,7 +300,7 @@ export function ReportTasksTable({
           {pending && (
             <TableRow>
               <TableCell
-                colSpan={4}
+                colSpan={categoryName ? 5 : 4}
                 className="h-40 text-center text-xs text-muted-foreground"
               >
                 {t("tasks:reports.loadingTasks")}
@@ -297,7 +309,10 @@ export function ReportTasksTable({
           )}
           {!tasks.length && !pending && !error && (
             <TableRow>
-              <TableCell colSpan={4} className="py-14 text-center">
+              <TableCell
+                colSpan={categoryName ? 5 : 4}
+                className="py-14 text-center"
+              >
                 <p className="text-sm font-medium">
                   {t("tasks:reports.noTasks")}
                 </p>
@@ -313,6 +328,7 @@ export function ReportTasksTable({
             <TableCell className="ps-5 text-xs font-normal text-muted-foreground sm:ps-7">
               {t("tasks:reports.viewTotal")}
             </TableCell>
+            {categoryName && <TableCell className="hidden md:table-cell" />}
             <TableCell className="hidden md:table-cell" />
             <TableCell className="hidden sm:table-cell" />
             <TableCell className="pe-5 text-right text-sm tabular-nums sm:pe-7">

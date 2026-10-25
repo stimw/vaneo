@@ -18,6 +18,7 @@ export function reportCsv(
         [
           "Task",
           "Title",
+          "Category",
           "Assignee",
           "Last logged",
           "Period hours",
@@ -28,6 +29,7 @@ export function reportCsv(
         ...tasks.map((task) => [
           task.ticketId,
           task.title,
+          task.category ?? null,
           task.assigneeName,
           task.loggedAt ?? null,
           Number((task.totalSeconds / 3600).toFixed(4)),
@@ -42,10 +44,19 @@ export function reportCsv(
   return (
     "\ufeff" +
     [
-      ["Task", "Title", "Assignee", "Completed at", "Hours", "Seconds"],
+      [
+        "Task",
+        "Title",
+        "Category",
+        "Assignee",
+        "Completed at",
+        "Hours",
+        "Seconds",
+      ],
       ...tasks.map((task) => [
         task.ticketId,
         task.title,
+        task.category ?? null,
         task.assigneeName,
         task.completedAt,
         Number((task.totalSeconds / 3600).toFixed(4)),

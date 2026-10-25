@@ -1,5 +1,9 @@
 import { and, asc, count, eq, inArray, isNull } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
+import {
+  resolveReportCategory,
+  type ReportCategoryQuery,
+} from "../report-category";
 import db from "../../database";
 import {
   projectTable,
@@ -17,9 +21,12 @@ import {
 
 export default async function exportCompletedTasks(
   projectId: string,
-  period: { from: string; to: string; timeZone: string },
+  period: { from: string; to: string; timeZone: string } & ReportCategoryQuery,
   filters: Partial<
-    Pick<CompletedReportFilters, "search" | "day" | "zeroOnly" | "sort">
+    Pick<
+      CompletedReportFilters,
+      "search" | "day" | "zeroOnly" | "sort" | "categoryFieldId" | "category"
+    >
   > = {},
 ) {
   // A report must describe one snapshot even if tasks/timers change mid-export.
@@ -31,8 +38,13 @@ export default async function exportCompletedTasks(
       });
       if (!project)
         throw new HTTPException(404, { message: "Project not found" });
+      const category = await resolveReportCategory(tx, projectId, {
+        ...period,
+        ...filters,
+      });
       const rows = await tx
         .select({
+          category: category.value,
           id: taskTable.id,
           title: taskTable.title,
           description: taskTable.description,
@@ -48,6 +60,7 @@ export default async function exportCompletedTasks(
         .where(
           and(
             reportPeriodWhere(projectId, period),
+            category.where,
             reportFilterWhere(project.slug, {
               search: filters.search ?? "",
               day: filters.day,
@@ -115,12 +128,14 @@ export default async function exportCompletedTasks(
           and(
             eq(taskTable.projectId, projectId),
             taskIsCompleted,
+            category.where,
             isNull(taskTable.completedAt),
           ),
         );
       return {
         version: 1 as const,
         exportedAt: new Date(),
+        categoryField: category.field,
         project,
         period: {
           timeZone: period.timeZone,

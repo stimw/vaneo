@@ -1,3 +1,7 @@
+import {
+  reportCategoryFieldSchema,
+  reportCategoryTotalsSchema,
+} from "./report-category";
 import { responseTimestamp, z } from "../openapi";
 import { completedExportSchema } from "./completed-export-schema";
 
@@ -5,6 +9,7 @@ export const workReportTaskSchema = z.object({
   id: z.string(),
   ticketId: z.string(),
   title: z.string(),
+  category: z.string().nullable(),
   status: z.string(),
   completedAt: responseTimestamp.nullable(),
   loggedAt: z.string(),
@@ -18,6 +23,8 @@ export const workReportTaskSchema = z.object({
 export const workReportSchema = z
   .object({
     generatedAt: responseTimestamp,
+    categoryField: reportCategoryFieldSchema,
+    categories: reportCategoryTotalsSchema,
     project: completedExportSchema.shape.project,
     period: completedExportSchema.shape.period,
     summary: z.object({

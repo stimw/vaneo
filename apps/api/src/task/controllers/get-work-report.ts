@@ -1,3 +1,4 @@
+import { resolveReportCategory } from "../report-category";
 import { eq, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 import {
@@ -28,6 +29,7 @@ type WorkTask = {
   id: string;
   ticketId: string;
   title: string;
+  category: string | null;
   status: string;
   completedAt: Date | null;
   loggedAt: string;
@@ -50,6 +52,7 @@ export async function getWorkReport(
     });
     if (!project)
       throw new HTTPException(404, { message: "Project not found" });
+    const category = await resolveReportCategory(tx, projectId, query);
     const fromDay = localDate(query.from, query.timeZone);
     const toDay = localDate(query.to, query.timeZone);
     const timerDay = reportLocalDay(timeEntryTable.startTime, query.timeZone);
@@ -69,14 +72,14 @@ export async function getWorkReport(
     ), filtered_logs AS (SELECT * FROM logs ${query.day ? sql`WHERE day = ${query.day}` : sql``}),
     grouped AS (SELECT task_id, sum(seconds)::float8 AS seconds, max(day) AS day FROM filtered_logs GROUP BY task_id),
     rows AS (
-      SELECT ${taskTable.id} AS id, ${project.slug} || '-' || ${taskTable.number} AS "ticketId", ${taskTable.title} AS title,
+      SELECT ${category.value} AS category, ${taskTable.id} AS id, ${project.slug} || '-' || ${taskTable.number} AS "ticketId", ${taskTable.title} AS title,
         ${taskTable.status} AS status, ${taskTable.completedAt} AT TIME ZONE 'UTC' AS "completedAt", grouped.day AS "loggedAt",
         ${taskTable.userId} AS "assigneeId", ${userTable.name} AS "assigneeName", grouped.seconds AS "totalSeconds",
         ${taskTable.trackedSeconds}::float8 AS "trackedSeconds", ${taskTable.estimatedSeconds}::float8 AS "estimatedSeconds",
         CASE WHEN ${taskIsCompleted} THEN 100 ELSE ${taskTable.progress} END AS progress, ${taskTable.number} AS number
       FROM grouped JOIN ${taskTable} ON ${taskTable.id} = grouped.task_id
       LEFT JOIN ${userTable} ON ${userTable.id} = ${taskTable.userId}
-      WHERE ${search ? sql`concat_ws(' ', ${taskTable.title}, ${project.slug} || '-' || ${taskTable.number}, ${userTable.name}) ILIKE ${`%${search}%`}` : sql`true`}
+      WHERE ${category.where} AND ${search ? sql`concat_ws(' ', ${taskTable.title}, ${project.slug} || '-' || ${taskTable.number}, ${userTable.name}) ILIKE ${`%${search}%`}` : sql`true`}
         AND ${query.zeroOnly === "true" ? sql`false` : sql`true`}
     )`;
     const summary = (
@@ -97,7 +100,18 @@ export async function getWorkReport(
       SELECT filtered_logs.day AS date, count(DISTINCT task_id)::int AS "taskCount", sum(seconds)::float8 AS "totalSeconds"
       FROM filtered_logs JOIN rows ON rows.id = filtered_logs.task_id GROUP BY filtered_logs.day ORDER BY filtered_logs.day`)
     ).rows;
-    const fields = sql`id, "ticketId", title, status, "completedAt", "loggedAt", "assigneeId", "assigneeName", "totalSeconds", "trackedSeconds", "estimatedSeconds", progress`;
+    const categories = category.field
+      ? (
+          await tx.execute<{
+            category: string | null;
+            taskCount: number;
+            totalSeconds: number;
+          }>(
+            sql`${common} SELECT category, count(*)::int AS "taskCount", coalesce(sum("totalSeconds"), 0)::float8 AS "totalSeconds" FROM rows GROUP BY category ORDER BY category`,
+          )
+        ).rows
+      : [];
+    const fields = sql`category, id, "ticketId", title, status, "completedAt", "loggedAt", "assigneeId", "assigneeName", "totalSeconds", "trackedSeconds", "estimatedSeconds", progress`;
     const topTasks = (
       await tx.execute<WorkTask>(
         sql`${common} SELECT ${fields} FROM rows ORDER BY "totalSeconds" DESC, number, id LIMIT 3`,
@@ -110,6 +124,8 @@ export async function getWorkReport(
     ).rows;
     return {
       generatedAt: new Date(),
+      categoryField: category.field,
+      categories,
       project,
       period: {
         from: new Date(query.from),

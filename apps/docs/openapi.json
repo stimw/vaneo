@@ -985,6 +985,56 @@
             "type": "string",
             "format": "date-time"
           },
+          "categoryField": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "options"
+            ]
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "taskCount": {
+                  "type": "number"
+                },
+                "totalSeconds": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "category",
+                "taskCount",
+                "totalSeconds"
+              ]
+            }
+          },
           "project": {
             "type": "object",
             "properties": {
@@ -1084,6 +1134,12 @@
                 "title": {
                   "type": "string"
                 },
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "status": {
                   "type": "string"
                 },
@@ -1129,6 +1185,7 @@
                 "id",
                 "ticketId",
                 "title",
+                "category",
                 "status",
                 "completedAt",
                 "loggedAt",
@@ -1155,6 +1212,12 @@
                 "title": {
                   "type": "string"
                 },
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "status": {
                   "type": "string"
                 },
@@ -1200,6 +1263,7 @@
                 "id",
                 "ticketId",
                 "title",
+                "category",
                 "status",
                 "completedAt",
                 "loggedAt",
@@ -1227,6 +1291,8 @@
         },
         "required": [
           "generatedAt",
+          "categoryField",
+          "categories",
           "project",
           "period",
           "summary",
@@ -1794,6 +1860,31 @@
             "type": "string",
             "format": "date-time"
           },
+          "categoryField": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "options"
+            ]
+          },
           "project": {
             "type": "object",
             "properties": {
@@ -1871,6 +1962,12 @@
                 "title": {
                   "type": "string"
                 },
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "description": {
                   "type": [
                     "string",
@@ -1910,6 +2007,7 @@
                 "id",
                 "ticketId",
                 "title",
+                "category",
                 "description",
                 "status",
                 "completedAt",
@@ -1924,6 +2022,7 @@
         "required": [
           "version",
           "exportedAt",
+          "categoryField",
           "project",
           "period",
           "summary",
@@ -2019,6 +2118,56 @@
           "generatedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "categoryField": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "options": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "options"
+            ]
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "taskCount": {
+                  "type": "number"
+                },
+                "totalSeconds": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "category",
+                "taskCount",
+                "totalSeconds"
+              ]
+            }
           },
           "project": {
             "type": "object",
@@ -2119,6 +2268,12 @@
                 "title": {
                   "type": "string"
                 },
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "status": {
                   "type": "string"
                 },
@@ -2146,6 +2301,7 @@
                 "id",
                 "ticketId",
                 "title",
+                "category",
                 "status",
                 "completedAt",
                 "assigneeId",
@@ -2157,6 +2313,8 @@
         },
         "required": [
           "generatedAt",
+          "categoryField",
+          "categories",
           "project",
           "period",
           "summary",
@@ -2181,6 +2339,12 @@
                 "title": {
                   "type": "string"
                 },
+                "category": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
                 "status": {
                   "type": "string"
                 },
@@ -2208,6 +2372,7 @@
                 "id",
                 "ticketId",
                 "title",
+                "category",
                 "status",
                 "completedAt",
                 "assigneeId",
@@ -11063,6 +11228,29 @@
           {
             "schema": {
               "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Project single-select custom field used for mutually exclusive time categories."
+            },
+            "required": false,
+            "description": "Project single-select custom field used for mutually exclusive time categories.",
+            "name": "categoryFieldId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 500,
+              "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId."
+            },
+            "required": false,
+            "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId.",
+            "name": "category",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "format": "date-time",
               "example": "2026-01-31T09:00:00Z",
               "description": "Inclusive completion timestamp."
@@ -11247,6 +11435,29 @@
             "required": true,
             "name": "projectId",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Project single-select custom field used for mutually exclusive time categories."
+            },
+            "required": false,
+            "description": "Project single-select custom field used for mutually exclusive time categories.",
+            "name": "categoryFieldId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 500,
+              "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId."
+            },
+            "required": false,
+            "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId.",
+            "name": "category",
+            "in": "query"
           },
           {
             "schema": {
@@ -13251,6 +13462,29 @@
           {
             "schema": {
               "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Project single-select custom field used for mutually exclusive time categories."
+            },
+            "required": false,
+            "description": "Project single-select custom field used for mutually exclusive time categories.",
+            "name": "categoryFieldId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 500,
+              "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId."
+            },
+            "required": false,
+            "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId.",
+            "name": "category",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "format": "date-time",
               "example": "2026-01-31T09:00:00Z",
               "description": "Inclusive completion timestamp."
@@ -13404,6 +13638,29 @@
           {
             "schema": {
               "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Project single-select custom field used for mutually exclusive time categories."
+            },
+            "required": false,
+            "description": "Project single-select custom field used for mutually exclusive time categories.",
+            "name": "categoryFieldId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 500,
+              "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId."
+            },
+            "required": false,
+            "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId.",
+            "name": "category",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
               "format": "date-time",
               "example": "2026-01-31T09:00:00Z",
               "description": "Inclusive completion timestamp."
@@ -13509,6 +13766,29 @@
             "required": true,
             "name": "projectId",
             "in": "path"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200,
+              "description": "Project single-select custom field used for mutually exclusive time categories."
+            },
+            "required": false,
+            "description": "Project single-select custom field used for mutually exclusive time categories.",
+            "name": "categoryFieldId",
+            "in": "query"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "maxLength": 500,
+              "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId."
+            },
+            "required": false,
+            "description": "Filter by the selected field's value. Empty string selects uncategorized tasks. Requires categoryFieldId.",
+            "name": "category",
+            "in": "query"
           },
           {
             "schema": {

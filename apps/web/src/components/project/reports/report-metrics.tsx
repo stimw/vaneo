@@ -16,10 +16,10 @@ export function ReportMetrics({
   const seconds = summary.totalSeconds;
   return (
     <div
-      className="grid grid-cols-3 divide-x border-b"
+      className="grid grid-cols-2 divide-x border-b sm:grid-cols-3"
       aria-label={t("tasks:reports.periodSummary")}
     >
-      <div className="flex flex-col gap-1 px-5 py-5 sm:px-7">
+      <div className="col-span-2 flex flex-col gap-1 border-b px-5 py-4 sm:col-span-1 sm:border-b-0 sm:px-7 sm:py-5">
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           <span>
             {basis === "logged"

@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ProjectLayout from "@/components/common/project-layout";
 import PageTitle from "@/components/page-title";
+import { ReportCategories } from "@/components/project/reports/report-categories";
+import useGetCustomFieldsByProject from "@/hooks/queries/custom-field/use-get-custom-fields-by-project";
 import { ReportActivityChart } from "@/components/project/reports/report-activity-chart";
 import { ReportExportMenu } from "@/components/project/reports/report-export-menu";
 import { ReportMetrics } from "@/components/project/reports/report-metrics";
@@ -27,6 +29,8 @@ import { useCompletedReportTasks } from "@/hooks/queries/task/use-completed-repo
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 
 type ReportSearch = {
+  categoryFieldId?: string;
+  category?: string;
   from?: string;
   to?: string;
   taskId?: string;
@@ -38,6 +42,11 @@ export const Route = createFileRoute(
   "/_layout/_authenticated/dashboard/workspace/$workspaceId/project/$projectId/reports",
 )({
   validateSearch: (search: Record<string, unknown>): ReportSearch => ({
+    categoryFieldId:
+      typeof search.categoryFieldId === "string"
+        ? search.categoryFieldId
+        : undefined,
+    category: typeof search.category === "string" ? search.category : undefined,
     basis: search.basis === "completed" ? "completed" : "logged",
     from: typeof search.from === "string" ? search.from : undefined,
     to: typeof search.to === "string" ? search.to : undefined,
@@ -65,10 +74,53 @@ function ProjectReports() {
   const to = validSearch ? search.to! : format(today, "yyyy-MM-dd");
   const period = completedReportPeriod(from, to)!;
   const basis = search.basis ?? "logged";
+  const fieldsQuery = useGetCustomFieldsByProject(projectId);
+  const categoryFields = (fieldsQuery.data ?? []).filter(
+    (field) => field.type === "dropdown",
+  );
+  const categoryFieldId =
+    (search.categoryFieldId ??
+      categoryFields.find((field) => field.required)?.id) ||
+    undefined;
+  const categoryFilter = {
+    categoryFieldId,
+    category: categoryFieldId ? search.category : undefined,
+  };
   const query = useQuery({
-    queryKey: ["completed-reports", projectId, "summary", period, basis],
+    queryKey: [
+      "completed-reports",
+      projectId,
+      "summary",
+      period,
+      basis,
+      categoryFilter,
+    ],
     queryFn: ({ signal }) =>
-      getCompletedReport(projectId, period, signal, basis),
+      getCompletedReport(projectId, period, signal, basis, categoryFilter),
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+  });
+  // Keep the full-period comparison visible while the detail report is filtered.
+  // Identical keys deduplicate this request with the summary when no category is selected.
+  const categoryOverviewFilter = { categoryFieldId, category: undefined };
+  const categoryOverview = useQuery({
+    queryKey: [
+      "completed-reports",
+      projectId,
+      "summary",
+      period,
+      basis,
+      categoryOverviewFilter,
+    ],
+    queryFn: ({ signal }) =>
+      getCompletedReport(
+        projectId,
+        period,
+        signal,
+        basis,
+        categoryOverviewFilter,
+      ),
+    enabled: Boolean(categoryFieldId),
     staleTime: 15_000,
     refetchInterval: 30_000,
   });
@@ -79,6 +131,7 @@ function ProjectReports() {
   const [pageSize, setPageSize] = useState(10);
   const debouncedText = useDebouncedValue(text.trim(), 300);
   const filters: ReportFilters = {
+    ...categoryFilter,
     search: debouncedText,
     day: search.day,
     zeroOnly: basis === "completed" && zeroOnly ? "true" : "false",
@@ -102,7 +155,7 @@ function ProjectReports() {
       workspaceId={workspaceId}
       projectId={projectId}
       activeView="reports"
-      toolbarClassName="max-sm:h-auto max-sm:flex-wrap max-sm:py-2"
+      toolbarClassName="max-sm:h-auto max-sm:flex-wrap max-sm:py-2 max-sm:[&>div:last-child]:w-full max-sm:[&>div:last-child]:min-w-0"
       summary={
         <div className="hidden min-w-0 items-center gap-3 text-[11px] text-muted-foreground xl:flex">
           <span>
@@ -117,7 +170,7 @@ function ProjectReports() {
         </div>
       }
       toolbar={
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <Tabs
             value={basis}
             onValueChange={(value) => {
@@ -165,6 +218,7 @@ function ProjectReports() {
             onClick={() => {
               void query.refetch();
               void details.refetch();
+              if (categoryFieldId) void categoryOverview.refetch();
             }}
           >
             <RefreshCw
@@ -177,6 +231,22 @@ function ProjectReports() {
     >
       <PageTitle title={t("tasks:reports.title")} />
       <div className="h-full overflow-y-auto" aria-busy={query.isFetching}>
+        {(categoryFields.length > 0 || search.categoryFieldId) && (
+          <ReportCategories
+            fields={categoryFields}
+            fieldId={categoryFieldId}
+            category={categoryFilter.category}
+            report={categoryOverview.data}
+            pending={categoryOverview.isPending}
+            error={categoryOverview.isError}
+            onRetry={() => {
+              void categoryOverview.refetch();
+            }}
+            onChange={(fieldId, category) => {
+              void setSearch({ categoryFieldId: fieldId, category });
+            }}
+          />
+        )}
         {query.isPending ? (
           <div className="flex flex-col gap-5 p-7">
             <Skeleton className="h-24 w-full" />
@@ -217,6 +287,7 @@ function ProjectReports() {
                 />
               </div>
               <ReportTasksTable
+                categoryName={query.data.categoryField?.name}
                 basis={basis}
                 tasks={details.current?.tasks ?? []}
                 totalCount={details.current?.summary.taskCount ?? 0}

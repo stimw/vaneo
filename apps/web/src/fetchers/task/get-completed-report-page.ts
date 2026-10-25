@@ -3,6 +3,8 @@ import { HttpError } from "@/lib/http-error";
 import type { ReportBasis, ReportPeriod } from "./get-completed-report";
 
 export type ReportFilters = {
+  categoryFieldId?: string;
+  category?: string;
   search: string;
   day?: string;
   zeroOnly: "true" | "false";

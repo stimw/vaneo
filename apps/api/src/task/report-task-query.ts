@@ -9,6 +9,7 @@ import {
   or,
   sql,
   type SQLWrapper,
+  type SQL,
 } from "drizzle-orm";
 import { taskTable, userTable } from "../database/schema";
 import type { CompletedReportFilters } from "./completed-report-schema";
@@ -72,8 +73,12 @@ export const reportTotals = {
     ),
 };
 
-export function reportTaskFields(slug: string) {
+export function reportTaskFields(
+  slug: string,
+  category: SQL<string | null> = sql`null::text`,
+) {
   return {
+    category,
     id: taskTable.id,
     ticketId: sql<string>`${slug} || '-' || ${taskTable.number}`,
     title: taskTable.title,

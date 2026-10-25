@@ -7,6 +7,7 @@ function useDeleteCustomField(projectId: string) {
   return useMutation({
     mutationFn: deleteCustomField,
     onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: ["completed-reports"] });
       queryClient.setQueryData(
         ["custom-fields", projectId],
         (existing: Array<{ id: string }> | undefined) => {

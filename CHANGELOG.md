@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Group Reports by a single-select business category, with hours, shares and
+  task counts. Category filters apply to task details and CSV/JSON exports
+  without double-counting time; the overview retains whole-period context.
+- Keep report controls accessible on narrow mobile screens.
+
 - Set task completion with a 0–100% slider or a percentage input. Completed
   tasks still show 100%, and clients retain read-only access to progress.
 - Remove estimated hours from task properties, card footers and Time logged

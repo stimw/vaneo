@@ -1,3 +1,7 @@
+import {
+  reportCategoryFieldSchema,
+  reportCategoryTotalsSchema,
+} from "./report-category";
 import { responseTimestamp, z } from "../openapi";
 import {
   completedExportQuery,
@@ -42,6 +46,8 @@ const totals = z.object({
 export const completedReportSummarySchema = z
   .object({
     generatedAt: responseTimestamp,
+    categoryField: reportCategoryFieldSchema,
+    categories: reportCategoryTotalsSchema,
     project: completedExportSchema.shape.project,
     period: completedExportSchema.shape.period,
     summary: totals.extend({ unknownCompletionCount: z.number() }),

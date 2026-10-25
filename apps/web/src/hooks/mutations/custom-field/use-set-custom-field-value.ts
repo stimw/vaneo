@@ -13,6 +13,7 @@ function useSetCustomFieldValue() {
     mutationFn: ({ taskId, fieldId, value }: SetCustomFieldValueArgs) =>
       setCustomFieldValue({ taskId, fieldId, value }),
     onSuccess: (_data, variables: SetCustomFieldValueArgs) => {
+      void queryClient.invalidateQueries({ queryKey: ["completed-reports"] });
       void queryClient.invalidateQueries({
         queryKey: ["custom-field-values"],
       });

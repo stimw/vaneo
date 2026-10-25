@@ -6,8 +6,9 @@ export type ReportSummary = Awaited<ReturnType<typeof getCompletedReport>>;
 type PageTask = Awaited<
   ReturnType<typeof getCompletedReportPage>
 >["tasks"][number];
-export type ReportTask = Omit<PageTask, "completedAt"> & {
+export type ReportTask = Omit<PageTask, "completedAt" | "category"> & {
   completedAt: string | null;
+  category?: string | null;
   loggedAt?: string;
   trackedSeconds?: number;
   estimatedSeconds?: number | null;

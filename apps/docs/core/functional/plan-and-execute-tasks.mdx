@@ -87,3 +87,29 @@ Required fields always keep a value, so they have no **Clear** option. If one is
 Use **Delete Task** only when you want to remove the task, rather than mark it done. Check the confirmation before proceeding. If deletion or assignment is unavailable, your workspace role may not permit it.
 
 For work you want to keep but are not ready to start, use the [backlog](/core/functional/backlog-planning).
+
+## Classify time without counting it twice
+
+For mutually exclusive billing categories, add a **dropdown** custom field in
+project settings (for example, **Business category**). Mark it required and
+choose a default; review that default when creating tasks. A task has one value
+in this field. Labels can still describe multiple affected areas, but are not
+used for time grouping.
+
+In **Reports**, choose that field under **Group by**. Both **Time logged** and
+**Completed** reports show a whole-period ring chart and ranked category bars, with hours,
+percentage and task counts. Select a category row to filter the details, or select
+it again (or clear the filter) to return to all tasks. The comparison always keeps
+all categories visible and percentages use the whole-period total, even while
+the task details are filtered. Category colors stay consistent when ranks change.
+Missing values appear as **Uncategorized**, so no hours disappear. Category
+subtotals partition the report total; tasks with multiple logs are counted once
+per category. The first required dropdown is selected initially; use **No
+grouping** or choose a different dropdown when needed.
+
+The report uses each task's current category, including for earlier work dates.
+Recategorizing a task moves its historical time between categories without
+changing the total. Split separately billed deliverables into separate tasks
+and divide the allocation between them instead of duplicating hours. CSV and
+JSON exports include the selected category on every matching task, across all
+pages.

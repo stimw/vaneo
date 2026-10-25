@@ -1,5 +1,9 @@
-import { and, count, eq, isNull } from "drizzle-orm";
+import { and, count, eq, isNull, sql } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
+import {
+  resolveReportCategory,
+  type ReportCategoryQuery,
+} from "../report-category";
 import db from "../../database";
 import { projectTable, taskTable, userTable } from "../../database/schema";
 import {
@@ -13,7 +17,7 @@ import { taskIsCompleted } from "../task-is-completed";
 
 export default async function getCompletedReport(
   projectId: string,
-  period: { from: string; to: string; timeZone: string },
+  period: { from: string; to: string; timeZone: string } & ReportCategoryQuery,
 ) {
   return db.transaction(
     async (tx) => {
@@ -23,7 +27,20 @@ export default async function getCompletedReport(
       });
       if (!project)
         throw new HTTPException(404, { message: "Project not found" });
-      const where = reportPeriodWhere(projectId, period);
+      const category = await resolveReportCategory(tx, projectId, period);
+      const where = and(reportPeriodWhere(projectId, period), category.where);
+      const categories = category.field
+        ? await tx
+            .select({
+              category: category.value,
+              taskCount: reportTotals.taskCount,
+              totalSeconds: reportTotals.totalSeconds,
+            })
+            .from(taskTable)
+            .where(where)
+            .groupBy(sql`1`)
+            .orderBy(sql`1`)
+        : [];
       const [summary = { taskCount: 0, totalSeconds: 0, zeroCount: 0 }] =
         await tx.select(reportTotals).from(taskTable).where(where);
       const day = reportCompletionDay(period.timeZone).as("completion_day");
@@ -34,7 +51,7 @@ export default async function getCompletedReport(
         .groupBy(({ date }) => date)
         .orderBy(({ date }) => date);
       const topTasks = await tx
-        .select(reportTaskFields(project.slug))
+        .select(reportTaskFields(project.slug, category.value))
         .from(taskTable)
         .leftJoin(userTable, eq(taskTable.userId, userTable.id))
         .where(where)
@@ -47,11 +64,14 @@ export default async function getCompletedReport(
           and(
             eq(taskTable.projectId, projectId),
             taskIsCompleted,
+            category.where,
             isNull(taskTable.completedAt),
           ),
         );
       return {
         generatedAt: new Date(),
+        categoryField: category.field,
+        categories,
         project,
         period: {
           ...period,

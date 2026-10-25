@@ -15,6 +15,7 @@ function useUpdateCustomField(projectId: string) {
       data: UpdateCustomFieldRequest;
     }) => updateCustomField(id, data),
     onSuccess: (updated) => {
+      void queryClient.invalidateQueries({ queryKey: ["completed-reports"] });
       queryClient.setQueryData(
         ["custom-fields", projectId],
         (existing: Array<typeof updated> | undefined) =>
