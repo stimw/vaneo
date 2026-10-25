@@ -49,6 +49,47 @@ describe("custom fields API", () => {
     return column.slug;
   }
 
+  it("requires explicit single-select categories without inserting an uncategorized task", async () => {
+    const { app, project } = await createFixture();
+    const [field] = await db
+      .insert(schema.customFieldDefinitionTable)
+      .values({
+        projectId: project.id,
+        name: "Business category",
+        type: "dropdown",
+        required: true,
+        defaultValue: "Misc",
+        options: ["Marketing", "Misc"],
+      })
+      .returning();
+    const create = (customFields?: { fieldId: string; value: string }[]) =>
+      app.request(`/api/task/${project.id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "Categorized task",
+          description: "",
+          status: "to-do",
+          priority: "no-priority",
+          customFields,
+        }),
+      });
+    for (const fields of [
+      undefined,
+      [],
+      [{ fieldId: field.id, value: "" }],
+      [{ fieldId: field.id, value: "unknown" }],
+    ]) {
+      expect((await create(fields)).status).toBe(400);
+    }
+    expect(await db.select().from(schema.taskTable)).toHaveLength(0);
+    const response = await create([{ fieldId: field.id, value: "Marketing" }]);
+    expect(response.status).toBe(200);
+    expect(await db.select().from(schema.customFieldValueTable)).toEqual([
+      expect.objectContaining({ fieldId: field.id, value: "Marketing" }),
+    ]);
+  });
+
   it("creates and retrieves a custom field for a project", async () => {
     const { app, project } = await createFixture();
 

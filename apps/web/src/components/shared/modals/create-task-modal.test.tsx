@@ -743,3 +743,35 @@ describe("CreateTaskModal custom fields", () => {
     );
   });
 });
+
+it("requires an explicit category even when the field has a default", async () => {
+  customFieldDefs = [
+    {
+      ...customField("Business category", "dropdown", true, "Misc"),
+      options: ["Marketing", "Misc"],
+    },
+  ];
+  render(<CreateTaskModal open onClose={vi.fn()} projectId="project-2" />, {
+    wrapper: createWrapper(),
+  });
+  enterTitle();
+  submit();
+  expect(
+    await screen.findByText("tasks:customFields.missingRequired"),
+  ).toBeInTheDocument();
+  expect(createTask).not.toHaveBeenCalled();
+  fireEvent.click(
+    document.querySelector(
+      '[data-custom-field="Business category"]',
+    ) as HTMLElement,
+  );
+  fireEvent.click(await screen.findByText("Marketing"));
+  submit();
+  await vi.waitFor(() =>
+    expect(createTask).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customFields: [{ fieldId: "Business category", value: "Marketing" }],
+      }),
+    ),
+  );
+});

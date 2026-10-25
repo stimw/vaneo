@@ -19,6 +19,7 @@ import { TaskProgressBadges } from "./task-progress-badges";
 import TaskSubtasks from "./task-subtasks";
 
 const mocks = vi.hoisted(() => ({
+  customFields: vi.fn(),
   canCreateTasks: vi.fn(),
   canUpdateTasks: vi.fn(),
   createTask: vi.fn(),
@@ -37,9 +38,16 @@ vi.mock("@tanstack/react-router", () => ({
 vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }: { children: unknown }) => children,
 }));
-vi.mock("react-i18next", () => ({
+vi.mock("react-i18next", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("react-i18next")>()),
   useTranslation: () => ({ t: (key: string) => key }),
 }));
+vi.mock(
+  "@/hooks/queries/custom-field/use-get-custom-fields-by-project",
+  () => ({
+    default: () => mocks.customFields(),
+  }),
+);
 vi.mock("@/hooks/mutations/task/use-create-task", () => ({
   default: () => ({ mutateAsync: mocks.createTask, isPending: false }),
 }));
@@ -81,6 +89,11 @@ vi.mock("@/lib/toast", () => ({
 }));
 
 beforeEach(() => {
+  mocks.customFields.mockReturnValue({
+    data: [],
+    isPending: false,
+    isError: false,
+  });
   mocks.getRelations.mockReturnValue({ data: [] });
   mocks.canCreateTasks.mockReturnValue(true);
   mocks.canUpdateTasks.mockReturnValue(true);
@@ -322,4 +335,57 @@ describe("cross-project subtask progress", () => {
       }),
     );
   });
+});
+
+it("blocks quick subtask creation until its category is selected", async () => {
+  mocks.customFields.mockReturnValue({
+    data: [
+      {
+        id: "category",
+        name: "Business category",
+        type: "dropdown",
+        required: true,
+        defaultValue: "Misc",
+        options: ["Marketing", "Misc"],
+      },
+    ],
+    isPending: false,
+    isError: false,
+  });
+  mocks.createTask.mockResolvedValue({ id: "child" });
+  mocks.createRelation.mockResolvedValue({});
+  render(
+    <TaskSubtasks
+      taskId="parent"
+      projectId="project-1"
+      workspaceId="workspace-1"
+      parentStatus="planned"
+    />,
+  );
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: "tasks:subtasks.addAction tasks:subtasks.title",
+    }),
+  );
+  const title = screen.getByPlaceholderText("tasks:subtasks.inputPlaceholder");
+  fireEvent.change(title, { target: { value: "New child" } });
+  fireEvent.keyDown(title, { key: "Enter" });
+  expect(mocks.createTask).not.toHaveBeenCalled();
+  expect(
+    screen.getByRole("button", { name: "tasks:subtasks.addAction" }),
+  ).toBeDisabled();
+  fireEvent.click(
+    document.querySelector('[data-custom-field="category"]') as HTMLElement,
+  );
+  fireEvent.click(await screen.findByText("Marketing"));
+  fireEvent.click(
+    screen.getByRole("button", { name: "tasks:subtasks.addAction" }),
+  );
+  await waitFor(() =>
+    expect(mocks.createTask).toHaveBeenCalledWith(
+      expect.objectContaining({
+        customFields: [{ fieldId: "category", value: "Marketing" }],
+      }),
+    ),
+  );
 });

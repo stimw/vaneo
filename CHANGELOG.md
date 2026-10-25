@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Require explicit selection of required single-select fields when creating tasks
+  and subtasks, including API requests; expose custom field inputs to MCP callers.
+
 - Group Reports by a single-select business category, with hours, shares and
   task counts. Category filters apply to task details and CSV/JSON exports
   without double-counting time; the overview retains whole-period context.

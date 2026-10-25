@@ -285,7 +285,8 @@ export function registerTools(
   registerTool(
     "create_task",
     {
-      description: "Create a task in a project.",
+      description:
+        "Create a task in a project. Supply an explicit value for every required single-select custom field.",
       inputSchema: z.object({
         projectId: nonEmptyString,
         title: nonEmptyString,
@@ -295,15 +296,20 @@ export function registerTools(
         startDate: optionalIsoDateTimeSchema,
         dueDate: optionalIsoDateTimeSchema,
         userId: optionalNonEmptyString,
+        customFields: z
+          .array(z.object({ fieldId: nonEmptyString, value: z.string() }))
+          .optional(),
       }),
     },
     async (args) => {
-      const body: Record<string, string | undefined> = {
+      const body: Record<string, unknown> = {
         title: args.title,
         description: args.description,
         priority: args.priority,
         status: args.status,
       };
+      if (args.customFields !== undefined)
+        body.customFields = args.customFields;
       if (args.startDate !== undefined) {
         body.startDate = args.startDate;
       }

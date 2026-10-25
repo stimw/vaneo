@@ -1,3 +1,5 @@
+import { CustomFieldChip } from "@/components/custom-fields/custom-field-chip";
+import useGetCustomFieldsByProject from "@/hooks/queries/custom-field/use-get-custom-fields-by-project";
 import { useNavigate } from "@tanstack/react-router";
 import { AnimatePresence } from "framer-motion";
 import { Trash2Icon } from "lucide-react";
@@ -62,6 +64,27 @@ export default function TaskSubtasks({
     workspace?.id ?? "",
   );
   const createTask = useCreateTask();
+  const {
+    data: customFields = [],
+    isPending: fieldsPending,
+    isError: fieldsError,
+  } = useGetCustomFieldsByProject(projectId);
+  const requiredChoices = customFields
+    .filter((field) => field.required && field.type === "dropdown")
+    .map((field) => ({
+      ...field,
+      type: "dropdown" as const,
+      options: Array.isArray(field.options)
+        ? field.options.filter(
+            (option): option is string => typeof option === "string",
+          )
+        : [],
+    }));
+  const [fieldValues, setFieldValues] = useState<Record<string, string>>({});
+  const missingChoices = requiredChoices.some(
+    (field) => !fieldValues[field.id]?.trim(),
+  );
+  const awaitingChoices = fieldsPending || fieldsError || missingChoices;
   const createRelation = useCreateTaskRelation();
   const { mutateAsync: deleteTask } = useDeleteTask();
   const { mutateAsync: updateTaskStatus } = useUpdateTaskStatus();
@@ -267,7 +290,7 @@ export default function TaskSubtasks({
   ]);
 
   const handleAddSubtask = async () => {
-    if (!canCreate || !canEdit || !newTitle.trim()) return;
+    if (!canCreate || !canEdit || !newTitle.trim() || awaitingChoices) return;
     const initialStatus = parentStatus === "planned" ? "planned" : todoSlug;
     if (!initialStatus) return;
 
@@ -278,6 +301,10 @@ export default function TaskSubtasks({
         projectId,
         status: initialStatus,
         priority: "no-priority",
+        customFields: requiredChoices.map((field) => ({
+          fieldId: field.id,
+          value: fieldValues[field.id],
+        })),
       });
 
       await createRelation.mutateAsync({
@@ -287,6 +314,7 @@ export default function TaskSubtasks({
       });
 
       setNewTitle("");
+      setFieldValues({});
       setIsAdding(false);
     } catch {
       toast.error(t("tasks:subtasks.createError"));
@@ -401,7 +429,7 @@ export default function TaskSubtasks({
         </div>
 
         {isAdding && canEdit && canCreate && (
-          <div className="flex items-center gap-2 px-1 pt-1">
+          <div className="flex flex-wrap items-center gap-2 px-1 pt-1">
             <Input
               size="sm"
               placeholder={t("tasks:subtasks.inputPlaceholder")}
@@ -415,15 +443,32 @@ export default function TaskSubtasks({
                   e.stopPropagation();
                   setIsAdding(false);
                   setNewTitle("");
+                  setFieldValues({});
                 }
               }}
               autoFocus
             />
+            {requiredChoices.map((field) => (
+              <CustomFieldChip
+                key={field.id}
+                field={field}
+                value={fieldValues[field.id] ?? ""}
+                onChange={(value) =>
+                  setFieldValues((previous) => ({
+                    ...previous,
+                    [field.id]: value,
+                  }))
+                }
+              />
+            ))}
             <Button
               size="xs"
               onClick={handleAddSubtask}
               disabled={
-                !newTitle.trim() || createTask.isPending || !canCreateSubtask
+                !newTitle.trim() ||
+                createTask.isPending ||
+                !canCreateSubtask ||
+                awaitingChoices
               }
             >
               {t("tasks:subtasks.addAction")}
@@ -434,6 +479,7 @@ export default function TaskSubtasks({
               onClick={() => {
                 setIsAdding(false);
                 setNewTitle("");
+                setFieldValues({});
               }}
             >
               {t("common:actions.cancel")}

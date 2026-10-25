@@ -88,8 +88,18 @@ async function createTask({
 
   for (const field of allFields) {
     if (
+      field.required &&
+      field.type === "dropdown" &&
+      !providedFieldIds.has(field.id)
+    ) {
+      throw new HTTPException(400, {
+        message: `Custom field "${field.name}" must be selected to create a task.`,
+      });
+    }
+    if (
       !providedFieldIds.has(field.id) &&
       field.required &&
+      field.type !== "dropdown" &&
       field.defaultValue != null &&
       !isCustomFieldValueEmpty(
         field.defaultValue,

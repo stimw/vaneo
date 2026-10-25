@@ -113,3 +113,7 @@ changing the total. Split separately billed deliverables into separate tasks
 and divide the allocation between them instead of duplicating hours. CSV and
 JSON exports include the selected category on every matching task, across all
 pages.
+
+Required single-select fields must be chosen explicitly when creating a task or
+subtask. Their defaults are not applied to new tasks. API and MCP callers must
+supply these values in `customFields`; existing tasks keep their saved values.

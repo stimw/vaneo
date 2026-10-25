@@ -12699,7 +12699,8 @@
                         "fieldId",
                         "value"
                       ]
-                    }
+                    },
+                    "description": "Custom field values. Required single-select fields must be explicitly supplied even when a default is configured."
                   }
                 },
                 "required": [

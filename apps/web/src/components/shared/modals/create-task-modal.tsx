@@ -324,7 +324,10 @@ function CreateTaskModalContent({
       Object.fromEntries(
         customFields.map((field) => [
           field.id,
-          previousValues[field.id] ?? field.defaultValue ?? "",
+          previousValues[field.id] ??
+            (field.required && field.type === "dropdown"
+              ? ""
+              : (field.defaultValue ?? "")),
         ]),
       ),
     );
@@ -354,7 +357,10 @@ function CreateTaskModalContent({
 
   const buildDefaultCustomFieldValues = useCallback(() => {
     return customFields.reduce<Record<string, string>>((acc, field) => {
-      acc[field.id] = field.defaultValue ?? "";
+      acc[field.id] =
+        field.required && field.type === "dropdown"
+          ? ""
+          : (field.defaultValue ?? "");
       return acc;
     }, {});
   }, [customFields]);
@@ -362,7 +368,10 @@ function CreateTaskModalContent({
   const hasCustomFieldChanges = Object.entries(customFieldValues).some(
     ([fieldId, value]) => {
       const field = customFields.find((f) => f.id === fieldId);
-      const defaultValue = field?.defaultValue ?? "";
+      const defaultValue =
+        field?.required && field.type === "dropdown"
+          ? ""
+          : (field?.defaultValue ?? "");
       return value !== defaultValue;
     },
   );

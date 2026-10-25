@@ -30,6 +30,25 @@ function createServerMock() {
 }
 
 describe("registerTools", () => {
+  it("passes explicit custom field values when creating a task", async () => {
+    const { server, tools } = createServerMock();
+    const client = { json: vi.fn().mockResolvedValue({ id: "task" }) };
+    registerTools(server as never, { client: client as never });
+    const args = {
+      projectId: "project",
+      title: "Task",
+      description: "",
+      priority: "low",
+      status: "to-do",
+      customFields: [{ fieldId: "category", value: "Marketing" }],
+    };
+    const tool = tools.get("create_task")!;
+    expect(tool.config.inputSchema?.parse(args)).toEqual(args);
+    await tool.handler(args);
+    expect(JSON.parse(client.json.mock.calls[0][1].body).customFields).toEqual(
+      args.customFields,
+    );
+  });
   it("exports a completion period without filtering away time outside that period", async () => {
     const { server, tools } = createServerMock();
     const report = { tasks: [], summary: { taskCount: 0, totalSeconds: 0 } };

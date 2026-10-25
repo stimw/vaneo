@@ -84,7 +84,11 @@ export const createTaskBody = z.object({
   draftAssetIds: z.array(z.string()).max(100).optional(),
   customFields: z
     .array(z.object({ fieldId: z.string(), value: z.string() }))
-    .optional(),
+    .optional()
+    .openapi({
+      description:
+        "Custom field values. Required single-select fields must be explicitly supplied even when a default is configured.",
+    }),
 });
 
 export const updateTaskBody = z.object({
