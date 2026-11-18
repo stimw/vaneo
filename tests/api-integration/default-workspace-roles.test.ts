@@ -139,6 +139,7 @@ describe("default workspace roles", () => {
       deleteTasks: false,
       createTimeEntries: false,
       updateTimeEntries: false,
+      writeCustomFieldValues: false,
     });
     expect((await app.request(`/api/project/${project.id}`)).status).toBe(200);
     expect((await app.request(`/api/time-entry/task/${task.id}`)).status).toBe(

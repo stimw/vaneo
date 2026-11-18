@@ -87,7 +87,7 @@ export const createTaskBody = z.object({
     .optional()
     .openapi({
       description:
-        "Custom field values. Required single-select fields must be explicitly supplied even when a default is configured.",
+        "Custom field values. Requires customFieldValue:write. With that permission, required single-select fields must be explicitly supplied even when a default is configured; without it, omit this field and required fields are not enforced.",
     }),
 });
 

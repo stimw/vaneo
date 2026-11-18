@@ -69,6 +69,7 @@ const RESOURCE_LABELS: Record<string, string> = {
   project: "Projects",
   task: "Tasks",
   timeEntry: "Time entries",
+  customFieldValue: "Category",
   label: "Labels",
   workspace: "Workspace",
 };
@@ -181,6 +182,11 @@ const PERMISSION_LABELS: Record<
   "timeEntry:update": {
     label: "Edit time entries",
     description: "Set task time totals and edit time entries.",
+  },
+  "customFieldValue:write": {
+    label: "Write category",
+    description:
+      "Set the category and other custom fields when creating or editing tasks.",
   },
   "label:create": {
     label: "Create labels",

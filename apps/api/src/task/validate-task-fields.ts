@@ -125,6 +125,7 @@ export function validateCustomFieldValue(
 export async function assertRequiredCustomFields(
   projectId: string,
   customFields: { fieldId: string; value: string }[] = [],
+  enforceRequired = true,
 ): Promise<void> {
   const allFields = await db
     .select({
@@ -160,7 +161,7 @@ export async function assertRequiredCustomFields(
       | "multiselect";
 
     if (isCustomFieldValueEmpty(cf.value, type)) {
-      if (def.required) {
+      if (def.required && enforceRequired) {
         throw new HTTPException(400, {
           message: `Custom field "${def.name}" is required to create a task.`,
         });
@@ -198,6 +199,8 @@ export async function assertRequiredCustomFields(
       })
       .map((f) => f.fieldId),
   );
+
+  if (!enforceRequired) return;
 
   for (const field of allFields.filter((f) => f.required)) {
     const isSatisfied =

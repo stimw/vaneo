@@ -188,10 +188,11 @@ const setCustomFieldValueRoute = createRoute({
   path: "/value",
   tags: ["Custom Fields"],
   summary: "Set custom field value",
-  description: "Create or update a custom field value for a task.",
+  description:
+    "Create or update a custom field value for an existing task. Requires customFieldValue:write.",
   middleware: [
     workspaceAccess.fromTaskId("taskId"),
-    requireWorkspacePermission({ task: ["update"] }),
+    requireWorkspacePermission({ customFieldValue: ["write"] }),
   ] as const,
   request: {
     body: {
@@ -206,7 +207,7 @@ const setCustomFieldValueRoute = createRoute({
     ),
     400: errorResponse("Invalid body, or unknown custom field"),
     403: errorResponse(
-      "No access to the project, or missing task:update permission",
+      "No access to the project, or missing customFieldValue:write permission",
     ),
     404: errorResponse("Task not found"),
   },

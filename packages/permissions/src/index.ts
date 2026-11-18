@@ -11,6 +11,9 @@ export const statement = {
   project: ["create", "read", "update", "delete", "share"],
   task: ["create", "read", "update", "delete", "assign"],
   timeEntry: ["create", "update"],
+  // Writing custom field values such as a task's category, at creation or
+  // later. Without it, required fields are not enforced when creating tasks.
+  customFieldValue: ["write"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
 } as const;
@@ -37,6 +40,7 @@ export const member = ac.newRole({
   project: ["create", "read"],
   task: ["create", "read", "update"],
   timeEntry: ["create", "update"],
+  customFieldValue: ["write"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read"],
 });
@@ -46,6 +50,7 @@ export const admin = ac.newRole({
   project: ["create", "read", "update", "delete", "share"],
   task: ["create", "read", "update", "delete", "assign"],
   timeEntry: ["create", "update"],
+  customFieldValue: ["write"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "manage_settings"],
 });
@@ -55,6 +60,7 @@ export const owner = ac.newRole({
   project: ["create", "read", "update", "delete", "share"],
   task: ["create", "read", "update", "delete", "assign"],
   timeEntry: ["create", "update"],
+  customFieldValue: ["write"],
   label: ["create", "read", "update", "delete"],
   workspace: ["read", "update", "delete", "manage_settings"],
 });

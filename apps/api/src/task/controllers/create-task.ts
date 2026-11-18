@@ -56,6 +56,7 @@ async function createTask({
   description,
   priority,
   customFields,
+  enforceRequiredFields = true,
   draftAssetIds,
 }: {
   projectId: string;
@@ -68,6 +69,7 @@ async function createTask({
   description?: string;
   priority?: string;
   customFields?: CustomFieldInput[];
+  enforceRequiredFields?: boolean;
   draftAssetIds?: string[];
 }) {
   const resolvedStatus = status || "to-do";
@@ -88,6 +90,7 @@ async function createTask({
 
   for (const field of allFields) {
     if (
+      enforceRequiredFields &&
       field.required &&
       field.type === "dropdown" &&
       !providedFieldIds.has(field.id)
@@ -118,7 +121,11 @@ async function createTask({
     }
   }
 
-  await assertRequiredCustomFields(projectId, mergedCustomFields);
+  await assertRequiredCustomFields(
+    projectId,
+    mergedCustomFields,
+    enforceRequiredFields,
+  );
 
   let assignee: { name: string } | undefined;
 

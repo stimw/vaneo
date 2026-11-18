@@ -315,7 +315,7 @@ const createTaskRoute = createRoute({
     200: jsonResponse("The created task", taskSchema),
     400: errorResponse("Invalid body"),
     403: errorResponse(
-      "No access to the project, or missing task:create permission",
+      "No access to the project, missing task:create permission, or custom field values sent without customFieldValue:write",
     ),
     404: errorResponse("Project not found"),
   },
@@ -986,6 +986,17 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
 
     validateDateRange(parsedStartDate, parsedDueDate);
 
+    // Roles without customFieldValue:write (e.g. clients) create tasks without
+    // a category; required fields are then left for the team to fill in.
+    const canWriteFields = await hasWorkspacePermission(c, {
+      customFieldValue: ["write"],
+    });
+    if (!canWriteFields && customFields?.some((f) => f.value.trim() !== "")) {
+      throw new HTTPException(403, {
+        message: "Missing customFieldValue:write permission",
+      });
+    }
+
     const task = await createTask({
       projectId,
       currentUserId: c.get("userId"),
@@ -996,7 +1007,8 @@ const task = apiRouter<BaseVariables & { workspaceId: string }>()
       dueDate: parsedDueDate,
       priority,
       status,
-      customFields,
+      customFields: canWriteFields ? customFields : undefined,
+      enforceRequiredFields: canWriteFields,
       draftAssetIds,
     });
 

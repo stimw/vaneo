@@ -13,6 +13,7 @@ export const workspaceCapabilities = {
   assignTasks: { task: ["assign"] },
   createTimeEntries: { timeEntry: ["create"] },
   updateTimeEntries: { timeEntry: ["update"] },
+  writeCustomFieldValues: { customFieldValue: ["write"] },
   createLabels: { label: ["create"] },
   updateLabels: { label: ["update"] },
   deleteLabels: { label: ["delete"] },

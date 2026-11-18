@@ -205,7 +205,8 @@ function CreateTaskModalContent({
   const { data: workspaceLabels = [] } = useGetLabelsByWorkspace(
     workspace?.id || "",
   );
-  const { canCreateTasks, canCreateLabels } = useWorkspacePermission();
+  const { canCreateTasks, canCreateLabels, canWriteCustomFieldValues } =
+    useWorkspacePermission();
   const canCreateTaskCapability = canCreateTasks();
   const canCreateLabelCapability = canCreateLabels();
 
@@ -300,7 +301,12 @@ function CreateTaskModalContent({
     resolvedProjectId,
   ) as { data: CustomFieldDefinition[] | undefined };
 
-  const customFields = useMemo(() => rawCustomFields ?? [], [rawCustomFields]);
+  // Roles without category write access (e.g. clients) skip custom fields.
+  const canWriteFields = canWriteCustomFieldValues();
+  const customFields = useMemo(
+    () => (canWriteFields ? (rawCustomFields ?? []) : []),
+    [canWriteFields, rawCustomFields],
+  );
 
   const [customFieldValues, setCustomFieldValues] = useState<
     Record<string, string>

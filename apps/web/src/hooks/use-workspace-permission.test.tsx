@@ -78,6 +78,7 @@ describe("useWorkspacePermission", () => {
     expect(result.current.canDeleteTasks()).toBe(false);
     expect(result.current.canCreateTimeEntries()).toBe(false);
     expect(result.current.canUpdateTimeEntries()).toBe(false);
+    expect(result.current.canWriteCustomFieldValues()).toBe(false);
     expect(result.current.canCreateLabels()).toBe(true);
     expect(result.current.canUpdateLabels()).toBe(true);
     expect(result.current.canDeleteLabels()).toBe(false);

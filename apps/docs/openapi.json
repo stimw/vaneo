@@ -5360,6 +5360,9 @@
           "updateTimeEntries": {
             "type": "boolean"
           },
+          "writeCustomFieldValues": {
+            "type": "boolean"
+          },
           "createLabels": {
             "type": "boolean"
           },
@@ -5403,6 +5406,7 @@
           "assignTasks",
           "createTimeEntries",
           "updateTimeEntries",
+          "writeCustomFieldValues",
           "createLabels",
           "updateLabels",
           "deleteLabels",
@@ -12700,7 +12704,7 @@
                         "value"
                       ]
                     },
-                    "description": "Custom field values. Required single-select fields must be explicitly supplied even when a default is configured."
+                    "description": "Custom field values. Requires customFieldValue:write. With that permission, required single-select fields must be explicitly supplied even when a default is configured; without it, omit this field and required fields are not enforced."
                   }
                 },
                 "required": [
@@ -12745,7 +12749,7 @@
             }
           },
           "403": {
-            "description": "No access to the project, or missing task:create permission",
+            "description": "No access to the project, missing task:create permission, or custom field values sent without customFieldValue:write",
             "content": {
               "application/json": {
                 "schema": {
@@ -25279,7 +25283,7 @@
           "Custom Fields"
         ],
         "summary": "Set custom field value",
-        "description": "Create or update a custom field value for a task.",
+        "description": "Create or update a custom field value for an existing task. Requires customFieldValue:write.",
         "requestBody": {
           "required": true,
           "content": {
@@ -25338,7 +25342,7 @@
             }
           },
           "403": {
-            "description": "No access to the project, or missing task:update permission",
+            "description": "No access to the project, or missing customFieldValue:write permission",
             "content": {
               "application/json": {
                 "schema": {

@@ -25,7 +25,7 @@ export function useTaskCustomFields(taskId: string, projectId: string) {
     data: StoredValue[] | undefined;
   };
   const { mutateAsync: setCustomFieldValue } = useSetCustomFieldValue();
-  const { canUpdateTasks } = useWorkspacePermission();
+  const { canWriteCustomFieldValues } = useWorkspacePermission();
   const [pending, setPending] = useState<Record<string, string>>({});
   const [seenStored, setSeenStored] = useState(stored);
 
@@ -73,5 +73,5 @@ export function useTaskCustomFields(taskId: string, projectId: string) {
     }
   };
 
-  return { fields, values, save, canEdit: canUpdateTasks() };
+  return { fields, values, save, canEdit: canWriteCustomFieldValues() };
 }

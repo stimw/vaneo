@@ -30,6 +30,7 @@ describe("@kaneo/permissions statement surface", () => {
     ]);
     expect(statement.label).toEqual(["create", "read", "update", "delete"]);
     expect(statement.timeEntry).toEqual(["create", "update"]);
+    expect(statement.customFieldValue).toEqual(["write"]);
     expect(statement.workspace).toEqual([
       "read",
       "update",
@@ -63,6 +64,13 @@ describe("built-in role privileges", () => {
       expect(role.statements.timeEntry).toEqual(["create", "update"]);
     }
     expect(viewer.statements).not.toHaveProperty("timeEntry");
+  });
+  it("lets team roles, but not clients or viewers, change task categories", () => {
+    for (const role of [member, admin, owner]) {
+      expect(role.statements.customFieldValue).toEqual(["write"]);
+    }
+    expect(client.statements).not.toHaveProperty("customFieldValue");
+    expect(viewer.statements).not.toHaveProperty("customFieldValue");
   });
   it("viewer can read but cannot create or modify", () => {
     expect(viewer.statements.project).toEqual(["read"]);
