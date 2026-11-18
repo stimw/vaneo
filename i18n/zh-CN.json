@@ -892,7 +892,8 @@
 				"invitation": "邀请",
 				"team": "团队",
 				"ac": "角色与权限",
-				"timeEntry": "Time entries"
+				"timeEntry": "Time entries",
+				"customFieldValue": "分类"
 			},
 			"permissions": {
 				"project": {
@@ -1049,6 +1050,12 @@
 					"update": {
 						"description": "Set task time totals and edit time entries.",
 						"label": "Edit time entries"
+					}
+				},
+				"customFieldValue": {
+					"write": {
+						"description": "创建或编辑任务时设置分类和其他自定义字段。",
+						"label": "写入分类"
 					}
 				}
 			},

@@ -2181,6 +2181,12 @@
 						"description": "Set task time totals and edit time entries.",
 						"label": "Edit time entries"
 					}
+				},
+				"customFieldValue": {
+					"write": {
+						"description": "Set the category and other custom fields when creating or editing tasks.",
+						"label": "Write category"
+					}
 				}
 			},
 			"resources": {
@@ -2193,7 +2199,8 @@
 				"invitation": "Invitations",
 				"team": "Teams",
 				"ac": "Roles and permissions",
-				"timeEntry": "Time entries"
+				"timeEntry": "Time entries",
+				"customFieldValue": "Category"
 			},
 			"saveChanges": "Zapisz zmiany",
 			"sectionSubtitle": "Edytuj role domyślne lub dodaj własną. Członkowie zachowują przypisaną nazwę roli podczas edycji.",
